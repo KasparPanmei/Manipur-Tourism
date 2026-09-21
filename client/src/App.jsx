@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import ExploreManipur from "./pages/ExploreManipur.jsx";
 import EcoHomestays from "./pages/EcoHomestays.jsx";
 import CultureHeritageItems from "./pages/CultureHeritageItems.jsx";
+import Transportation from "./pages/Transportation.jsx";
 
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/ExploreManipur" element={<ExploreManipur />} />
             <Route path="/EcoHomestays" element={<EcoHomestays />} />
             <Route path="/CultureHeritageItems" element={<CultureHeritageItems />} />
+            <Route path="/Transportation" element={<Transportation />} />
           </Routes>
         </main>
         <Footer />
