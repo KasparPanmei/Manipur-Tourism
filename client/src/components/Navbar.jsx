@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -16,9 +16,11 @@ export default function Navbar() {
           />
 
           <div className="flex flex-col min-w-0 overflow-hidden">
-            <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-none text-[13px] sm:text-headline-sm">
-              MANIPUR TOURISM
-            </span>
+            <Link to="/" className="flex items-center gap-1.5">
+              <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-none text-[13px] sm:text-headline-sm">
+                MANIPUR TOURISM
+              </span>
+            </Link>
 
             <span className="font-label-sm text-label-sm text-outline tracking-wider uppercase font-semibold mt-1 text-[8px] sm:text-label-sm">
               Jewel of India | VistaVentures
@@ -28,61 +30,61 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden xl:flex items-center gap-space-xs p-1.5 rounded-xl bg-surface-container-low">
-          <a
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#explore-manipur"
+            to="/ExploreManipur"
           >
             Explore Manipur
-          </a>
+          </Link>
 
-          <a
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#guide-service"
+            to="/GuideService"
           >
             Guide Service
-          </a>
+          </Link>
 
-          <a
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#transportation"
+            to="/Transportation"
           >
             Transportation
-          </a>
+          </Link>
 
-          <a
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#eco-homestays"
+            to="/EcoHomestays"
           >
             Eco Homestays
-          </a>
-          <a
+          </Link>
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#culture-heritage-items"
+            to="/CultureHeritageItems"
           >
             Culture Heritage Items
-          </a>
-          <a
+          </Link>
+          <Link
             className="px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            href="#rental-service"
+            to="/RentalService"
           >
             Rental Service
-          </a>
+          </Link>
         </nav>
 
         {/* Right Controls */}
         <div className="flex items-center gap-1 shrink-0">
 
           {/* Helpline */}
-          <a
+          <Link
             className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-primary hover:bg-surface-container-high transition-colors"
-            href="tel:1800-345-3885"
+            to="tel:1800-345-3885"
           >
             <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
 
             <span className="font-label-sm text-label-sm font-bold tracking-normal">
               1800-345-3885
             </span>
-          </a>
+          </Link>
 
           {/* Language */}
           <div className="relative flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-low text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
@@ -138,51 +140,51 @@ export default function Navbar() {
       >
         <nav className="mx-5 md:mx-12 lg:mx-16 mb-4 p-2 rounded-2xl bg-surface-container-low shadow-[0_8px_24px_-4px_rgba(10,92,74,0.10)]">
 
-          <a
-            href="#explore-manipur"
+          <Link
+            to="/ExploreManipur"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Explore Manipur
-          </a>
+          </Link>
 
-          <a
-            href="#guide-service"
+          <Link
+            to="/GuideService"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Guide Service
-          </a>
+          </Link>
 
-          <a
-            href="#transportation"
+          <Link
+            to="/Transportation"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Transportation
-          </a>
+          </Link>
 
-          <a
-            href="#eco-homestays"
+          <Link
+            to="/EcoHomestays"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Eco Homestays
-          </a>
-          <a
-            href="#culture-heritage-items"
+          </Link>
+          <Link
+            to="/CultureHeritageItems"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Culture Heritage Items
-          </a>
-          <a
-            href="#rental-service"
+          </Link>
+          <Link
+            to="/RentalService"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center px-4 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
           >
             Rental Service
-          </a>
+          </Link>
 
         </nav>
       </div>

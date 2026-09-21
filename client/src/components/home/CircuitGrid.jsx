@@ -38,7 +38,7 @@ export default function CircuitGrid() {
       badge: "Botanical Wonder",
       badgeClass: "circuit-badge-tertiary",
       image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuC_7-M3q2P3Ss_xMkaWjnPk_3Vbkn5JiNChII35S-0KVSBkIZ7HF-77CZP2nngpOe-S6hWKHeW8Gr8R1GKGO-2Oq1UA0RkEhQySpJN-Rm_fX2DzPHQlMQq8AgMkdQf5UKYyPhhKMKw65r15oS3QorS_1zl_GAE2D_Jp742-hk2JjoxL9EkmZG9JPjW14DSNKyVgYVb6sDlNLgqeEF_pPVBaOFzgVydk3W2uPLlND8NehwQ8FWU5iFmXw",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDsz083T-1qzJmCJ3c_-gAdRf3KtmeIavRhYTe8FU5yCydceBfhb20YcLSfpT4z1f5zSlygiPbFI0LFplRTIRSRceZgka3xdKLJOvW1A6M792wkVX3LDM9BUnaMC2QdQiUqJMOX5QM1uyiWDWqC15v4R27rDnUS4OfKSvEAyPyMn-119F2JiPiWy6_TboQRWWo-jRlWHQdOFteAqWfGoSZQV9co7dq48Bd9SR03r36KJddHcGgzLWhunw",
       alt: "Shirui Kashong Peak in Ukhrul",
     },
 
