@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     getAdminDashboard,
     getAdminEILPBookings,
+    getAdminProductBookings,
 } from "../controllers/adminController.js";
 
 const router = Router();
@@ -17,6 +18,11 @@ router.get(
 router.get(
     "/bookings/eilp",
     getAdminEILPBookings
+);
+
+router.get(
+    "/bookings/products",
+    getAdminProductBookings
 );
 
 export default router;

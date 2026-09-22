@@ -147,6 +147,9 @@ export default function Admin() {
     const [page, setPage] = useState(1);
     const [eilpRecords, setEilpRecords] = useState([]);
     const [eilpPagination, setEilpPagination] = useState(emptyPagination);
+    const [productRecords, setProductRecords] = useState([]);
+    const [productPagination, setProductPagination] =
+        useState(emptyPagination);
     const [counts, setCounts] = useState({
         eilp: 0,
         product: 0,
@@ -229,6 +232,60 @@ export default function Admin() {
         }
     }, [page, search]);
 
+    const fetchProductRecords = useCallback(async () => {
+        try {
+            setLoadingRecords(true);
+            setError("");
+
+            const token = getStoredToken();
+
+            const response = await api.get(
+                "/admin/bookings/products",
+                {
+                    params: {
+                        page,
+                        limit: PAGE_SIZE,
+                        search: search.trim(),
+                    },
+                    headers: token
+                        ? {
+                            Authorization:
+                                `Bearer ${token}`,
+                        }
+                        : {},
+                }
+            );
+
+            setProductRecords(
+                response.data?.records || []
+            );
+
+            setProductPagination(
+                response.data?.pagination ||
+                emptyPagination
+            );
+
+        } catch (err) {
+            console.error(
+                "Product booking fetch error:",
+                err
+            );
+
+            setProductRecords([]);
+            setProductPagination(
+                emptyPagination
+            );
+
+            setError(
+                err.response?.data?.message ||
+                "Unable to load product booking records."
+            );
+
+        } finally {
+            setLoadingRecords(false);
+        }
+    }, [page, search]);
+
     useEffect(() => {
         fetchDashboard();
     }, [fetchDashboard]);
@@ -237,7 +294,15 @@ export default function Admin() {
         if (activeNav === "eilp") {
             fetchEilpRecords();
         }
-    }, [activeNav, fetchEilpRecords]);
+
+        if (activeNav === "product") {
+            fetchProductRecords();
+        }
+    }, [
+        activeNav,
+        fetchEilpRecords,
+        fetchProductRecords,
+    ]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -439,12 +504,22 @@ export default function Admin() {
                             onSearchChange={setSearch}
                             onViewBooking={setSelectedBooking}
                         />
-                    ) : (
-                        <CollectionPlaceholder
-                            collection={activeCollection}
-                            total={counts[activeNav] || 0}
+                    ) : activeNav === "product" ? (
+                        <ProductRecords
+                            records={productRecords}
+                            pagination={productPagination}
+                            loading={loadingRecords}
+                            page={page}
+                            onPageChange={setPage}
                         />
-                    )}
+                    ) :
+
+                        (
+                            <CollectionPlaceholder
+                                collection={activeCollection}
+                                total={counts[activeNav] || 0}
+                            />
+                        )}
                 </main>
             </div>
 
@@ -472,7 +547,7 @@ function MasterDashboard({ counts, totalBookings, loading, onSelect }) {
             title: "Product Bookings",
             icon: "shopping_bag",
             value: counts.product,
-            description: "Collection not connected yet",
+            description: "Live records from Order",
         },
         {
             key: "guide",
@@ -538,8 +613,11 @@ function MasterDashboard({ counts, totalBookings, loading, onSelect }) {
                     <button
                         key={card.key}
                         type="button"
-                        onClick={() => card.key === "eilp" && onSelect(card.key)}
-                        className={`text-left p-6 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xs transition-all ${card.key === "eilp"
+                        onClick={() =>
+                            (card.key === "eilp" || card.key === "product") &&
+                            onSelect(card.key)
+                        }
+                        className={`text-left p-6 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xs transition-all ${card.key === "eilp" || card.key === "product"
                             ? "hover:-translate-y-0.5 hover:border-primary/30 cursor-pointer"
                             : "opacity-80 cursor-default"
                             }`}
@@ -548,7 +626,7 @@ function MasterDashboard({ counts, totalBookings, loading, onSelect }) {
                             <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
                                 <span className="material-symbols-outlined">{card.icon}</span>
                             </div>
-                            {card.key === "eilp" ? (
+                            {card.key === "eilp" || card.key === "product" ? (
                                 <StatusBadge tone="success">Live</StatusBadge>
                             ) : (
                                 <StatusBadge>Pending model</StatusBadge>
@@ -607,7 +685,7 @@ function MasterDashboard({ counts, totalBookings, loading, onSelect }) {
                                 <div>
                                     <div className="text-sm font-semibold">{meta.label}</div>
                                     <div className="text-[11px] text-outline">
-                                        {key === "eilp"
+                                        {key === "eilp" || key === "product"
                                             ? "Connected to MongoDB"
                                             : "Awaiting model and route"}
                                     </div>
@@ -833,6 +911,275 @@ function EilpRecords({
                     total={pagination.total}
                     onPageChange={onPageChange}
                 />
+            </section>
+        </>
+    );
+}
+function ProductRecords({
+    records,
+    pagination,
+    loading,
+    page,
+    onPageChange,
+}) {
+    const pages = Math.max(
+        1,
+        pagination.pages || 1
+    );
+
+    return (
+        <>
+            <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div>
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                        <span className="material-symbols-outlined text-base">
+                            shopping_bag
+                        </span>
+
+                        MongoDB • Order
+                    </div>
+
+                    <h1 className="font-display text-3xl lg:text-[34px] font-bold text-primary tracking-tight mt-1">
+                        Product Bookings
+                    </h1>
+
+                    <p className="text-sm text-on-surface-variant mt-2">
+                        Product orders fetched directly from
+                        the Order collection.
+                    </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/40">
+                    <div className="text-[11px] uppercase tracking-wider text-outline">
+                        Total orders
+                    </div>
+
+                    <div className="text-2xl font-bold text-primary">
+                        {pagination.total}
+                    </div>
+                </div>
+            </section>
+
+            <section className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xs overflow-hidden">
+
+                <div className="px-5 sm:px-6 py-4 border-b border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 className="font-display text-lg font-bold text-primary">
+                            Product Orders
+                        </h2>
+
+                        <p className="text-xs text-outline mt-1">
+                            {pagination.total
+                                ? `Showing ${(page - 1) *
+                                PAGE_SIZE +
+                                1
+                                }–${Math.min(
+                                    page * PAGE_SIZE,
+                                    pagination.total
+                                )} of ${pagination.total
+                                }`
+                                : "No orders found"}
+                        </p>
+                    </div>
+
+                    <StatusBadge tone="success">
+                        Live MongoDB Data
+                    </StatusBadge>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[1100px] text-left text-sm">
+
+                        <thead>
+                            <tr className="bg-surface-container-low/60 text-outline text-[11px] font-bold uppercase tracking-wider border-b border-outline-variant/30">
+
+                                <th className="py-4 px-6">
+                                    Order
+                                </th>
+
+                                <th className="py-4 px-6">
+                                    Customer
+                                </th>
+
+                                <th className="py-4 px-6">
+                                    Products
+                                </th>
+
+                                <th className="py-4 px-6">
+                                    Amount
+                                </th>
+
+                                <th className="py-4 px-6">
+                                    Payment
+                                </th>
+
+                                <th className="py-4 px-6">
+                                    Date
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-outline-variant/20">
+
+                            {loading ? (
+                                <tr>
+                                    <td
+                                        colSpan="6"
+                                        className="py-16 text-center text-outline"
+                                    >
+                                        <span className="material-symbols-outlined animate-spin text-2xl">
+                                            progress_activity
+                                        </span>
+
+                                        <div className="mt-2 text-sm">
+                                            Loading product orders…
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : records.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan="6"
+                                        className="py-16 text-center"
+                                    >
+                                        <span className="material-symbols-outlined text-4xl text-outline-variant">
+                                            inbox
+                                        </span>
+
+                                        <div className="mt-2 font-semibold">
+                                            No product bookings found
+                                        </div>
+
+                                        <div className="text-xs text-outline mt-1">
+                                            The Order collection
+                                            currently returned no
+                                            matching records.
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                records.map((order) => (
+                                    <tr
+                                        key={order._id}
+                                        className="hover:bg-surface-container-low/40 transition-colors"
+                                    >
+
+                                        <td className="py-4 px-6 align-top">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-bold text-primary font-mono text-xs">
+                                                    {order.razorpayOrderId ||
+                                                        order._id}
+                                                </span>
+
+                                                <span className="text-xs text-outline">
+                                                    {formatDate(
+                                                        order.createdAt
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td className="py-4 px-6 align-top">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-semibold">
+                                                    {order.user?.name ||
+                                                        "—"}
+                                                </span>
+
+                                                <span className="text-xs text-on-surface-variant">
+                                                    {order.user?.phone ||
+                                                        "—"}
+                                                </span>
+
+                                                <span className="text-xs text-outline">
+                                                    {order.user?.email ||
+                                                        "—"}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td className="py-4 px-6 align-top">
+                                            <div className="flex flex-col gap-2">
+                                                {(order.items || []).map(
+                                                    (item, index) => (
+                                                        <div
+                                                            key={
+                                                                item.itemId ||
+                                                                index
+                                                            }
+                                                            className="flex items-center justify-between gap-4"
+                                                        >
+                                                            <span className="font-medium">
+                                                                {item.name}
+                                                            </span>
+
+                                                            <span className="text-xs text-outline whitespace-nowrap">
+                                                                ×{" "}
+                                                                {
+                                                                    item.quantity
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        </td>
+
+                                        <td className="py-4 px-6 align-top">
+                                            <span className="font-bold">
+                                                {formatCurrency(
+                                                    order.amount
+                                                )}
+                                            </span>
+                                        </td>
+
+                                        <td className="py-4 px-6 align-top">
+                                            <div className="flex flex-col items-start gap-1.5">
+
+                                                <StatusBadge
+                                                    tone={getPaymentTone(
+                                                        order.status
+                                                    )}
+                                                >
+                                                    {order.status ||
+                                                        "pending"}
+                                                </StatusBadge>
+
+                                                {order.razorpayPaymentId && (
+                                                    <span className="text-[10px] font-mono text-outline break-all max-w-[160px]">
+                                                        {
+                                                            order.razorpayPaymentId
+                                                        }
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+
+                                        <td className="py-4 px-6 align-top">
+                                            <span className="text-xs text-outline">
+                                                {formatDate(
+                                                    order.paidAt ||
+                                                    order.createdAt
+                                                )}
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                ))
+                            )}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <Pagination
+                    page={page}
+                    pages={pages}
+                    total={pagination.total}
+                    onPageChange={onPageChange}
+                />
+
             </section>
         </>
     );

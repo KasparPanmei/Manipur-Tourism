@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
 
@@ -34,6 +34,7 @@ export default function AccountModal({
 
     const [cartItems, setCartItems] = useState([]);
     const [bookingHistory, setBookingHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     const showMessage = (text, type = "error") => {
         setMessage(text);
@@ -49,11 +50,131 @@ export default function AccountModal({
             localStorage.setItem("authToken", token);
         }
 
-        localStorage.setItem("authUser", JSON.stringify(user));
+        localStorage.setItem(
+            "authUser",
+            JSON.stringify(user)
+        );
 
-        window.dispatchEvent(new Event("auth-user-changed"));
+        window.dispatchEvent(
+            new Event("auth-user-changed")
+        );
 
         setAuthUser(user);
+    };
+
+    const loadCart = async (openCart = false) => {
+        try {
+            const token =
+                localStorage.getItem("authToken");
+
+            if (!token) {
+                setCartItems([]);
+
+                if (openCart) {
+                    setView("cart");
+                }
+
+                return;
+            }
+
+            const response = await api.get(
+                "/cart",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const items =
+                response.data?.items || [];
+
+            setCartItems(items);
+
+            if (openCart) {
+                setView("cart");
+            }
+
+            return items;
+        } catch (error) {
+            console.error(
+                "Load cart error:",
+                error
+            );
+
+            showMessage(
+                error.response?.data?.message ||
+                "Unable to load your cart."
+            );
+
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const token =
+            localStorage.getItem("authToken");
+
+        if (!token) {
+            return;
+        }
+
+
+        if (initialView === "cart") {
+            loadCart(false).then(() => {
+                setView("cart");
+            });
+
+            return;
+        }
+
+        if (
+            initialView === "choose" ||
+            initialView === "user-account"
+        ) {
+            loadCart(false);
+        }
+    }, [initialView]);
+
+
+    useEffect(() => {
+        const handleCartUpdated = () => {
+            loadCart(false);
+        };
+
+        window.addEventListener(
+            "cart-updated",
+            handleCartUpdated
+        );
+
+        return () => {
+            window.removeEventListener(
+                "cart-updated",
+                handleCartUpdated
+            );
+        };
+    }, []);
+
+    const openCart = async () => {
+        clearMessage();
+
+        const token =
+            localStorage.getItem("authToken");
+
+        if (!token) {
+            setCartItems([]);
+            setView("cart");
+            return;
+        }
+
+        const items = await loadCart(false);
+
+        /*
+         * Only switch to Cart after the request completes.
+         */
+        if (items !== null) {
+            setView("cart");
+        }
     };
 
     const goBack = () => {
@@ -69,17 +190,37 @@ export default function AccountModal({
             return;
         }
 
-        if (view === "user" || view === "admin") {
+        if (
+            view === "user" ||
+            view === "admin"
+        ) {
             setView("choose");
             return;
         }
 
-        if (view === "cart" || view === "history") {
-            setView(
-                authUser?.role === "admin"
-                    ? "admin-account"
-                    : "user-account"
-            );
+        if (view === "cart") {
+            if (
+                authUser?.role === "user"
+            ) {
+                setView("user-account");
+            } else {
+                setView("choose");
+            }
+
+            return;
+        }
+
+        if (view === "history") {
+            if (authUser) {
+                setView(
+                    authUser.role === "admin"
+                        ? "admin-account"
+                        : "user-account"
+                );
+            } else {
+                setView("choose");
+            }
+
             return;
         }
 
@@ -88,7 +229,8 @@ export default function AccountModal({
 
 
     const sendUserOtp = async () => {
-        const cleanedMobile = mobile.replace(/\D/g, "");
+        const cleanedMobile =
+            mobile.replace(/\D/g, "");
 
         if (cleanedMobile.length !== 10) {
             showMessage(
@@ -140,12 +282,14 @@ export default function AccountModal({
             const response = await api.post(
                 "/auth/user/verify-otp",
                 {
-                    mobile: mobile.replace(/\D/g, ""),
+                    mobile:
+                        mobile.replace(/\D/g, ""),
                     otp: userOtp,
                 }
             );
 
-            const { token, user } = response.data || {};
+            const { token, user } =
+                response.data || {};
 
             if (!user) {
                 throw new Error(
@@ -153,9 +297,18 @@ export default function AccountModal({
                 );
             }
 
-            saveAuthentication(user, token);
+            saveAuthentication(
+                user,
+                token
+            );
+
+            await loadCart(false);
+
             if (onAuthenticated) {
-                onAuthenticated(user, token);
+                onAuthenticated(
+                    user,
+                    token
+                );
                 return;
             }
 
@@ -164,10 +317,6 @@ export default function AccountModal({
                 "success"
             );
 
-            /*
-             * Keep the modal open briefly so the user sees
-             * the successful authentication message.
-             */
             setTimeout(() => {
                 setView("user-account");
                 clearMessage();
@@ -183,48 +332,60 @@ export default function AccountModal({
         }
     };
 
-    const submitAdminCredentials = async () => {
-        if (!adminUsername.trim() || !adminPassword) {
-            showMessage(
-                "Enter both username and password."
-            );
-            return;
-        }
 
-        setLoading(true);
-        clearMessage();
-
-        try {
-            const response = await api.post(
-                "/auth/admin/login",
-                {
-                    username: adminUsername.trim(),
-                    password: adminPassword,
-                }
-            );
-
-            if (!response.data?.requiresOtp) {
-                throw new Error(
-                    "The server did not request administrator OTP."
+    const submitAdminCredentials =
+        async () => {
+            if (
+                !adminUsername.trim() ||
+                !adminPassword
+            ) {
+                showMessage(
+                    "Enter both username and password."
                 );
+                return;
             }
 
-            showMessage(
-                response.data?.message ||
-                "Credentials verified. Enter your administrator OTP.",
-                "success"
-            );
+            setLoading(true);
+            clearMessage();
 
-            setView("admin-otp");
-        } catch (error) {
-            showMessage(
-                error.response?.data?.message ||
-                "Administrator authentication failed."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+            try {
+                const response =
+                    await api.post(
+                        "/auth/admin/login",
+                        {
+                            username:
+                                adminUsername.trim(),
+                            password:
+                                adminPassword,
+                        }
+                    );
+
+                if (
+                    !response.data
+                        ?.requiresOtp
+                ) {
+                    throw new Error(
+                        "The server did not request administrator OTP."
+                    );
+                }
+
+                showMessage(
+                    response.data?.message ||
+                    "Credentials verified. Enter your administrator OTP.",
+                    "success"
+                );
+
+                setView("admin-otp");
+            } catch (error) {
+                showMessage(
+                    error.response?.data
+                        ?.message ||
+                    "Administrator authentication failed."
+                );
+            } finally {
+                setLoading(false);
+            }
+        };
 
     const verifyAdminOtp = async () => {
         if (!/^\d{6}$/.test(adminOtp)) {
@@ -238,26 +399,38 @@ export default function AccountModal({
         clearMessage();
 
         try {
-            const response = await api.post(
-                "/auth/admin/verify-otp",
-                {
-                    username: adminUsername.trim(),
-                    otp: adminOtp,
-                }
-            );
+            const response =
+                await api.post(
+                    "/auth/admin/verify-otp",
+                    {
+                        username:
+                            adminUsername.trim(),
+                        otp: adminOtp,
+                    }
+                );
 
-            const { token, user } = response.data || {};
+            const { token, user } =
+                response.data || {};
 
-            if (!user || user.role !== "admin") {
+            if (
+                !user ||
+                user.role !== "admin"
+            ) {
                 throw new Error(
                     "Administrator authentication was not confirmed."
                 );
             }
 
-            saveAuthentication(user, token);
+            saveAuthentication(
+                user,
+                token
+            );
 
             if (onAuthenticated) {
-                onAuthenticated(user, token);
+                onAuthenticated(
+                    user,
+                    token
+                );
             }
 
             onClose();
@@ -273,88 +446,116 @@ export default function AccountModal({
     };
 
 
-    const loadCart = async () => {
-        setLoading(true);
+    const openBookingHistory = () => {
         clearMessage();
 
-        try {
-            const token =
-                localStorage.getItem("authToken");
+        const token =
+            localStorage.getItem("authToken");
 
-            const response = await api.get(
-                "/cart",
-                {
-                    headers: token
-                        ? {
-                            Authorization:
-                                `Bearer ${token}`,
-                        }
-                        : {},
-                }
-            );
-
-            setCartItems(
-                response.data?.items ||
-                response.data?.cart?.items ||
-                []
-            );
-
-            setView("cart");
-        } catch (error) {
+        if (!token) {
             showMessage(
-                error.response?.data?.message ||
-                "Unable to load your cart."
+                "Please sign in to view your booking history."
             );
-        } finally {
-            setLoading(false);
+            return;
         }
+
+        /*
+         * Change the view immediately.
+         * The actual API request is handled by the
+         * useEffect below after React has rendered
+         * the history view.
+         */
+        setView("history");
     };
 
 
-    const loadBookingHistory = async () => {
-        setLoading(true);
-        clearMessage();
+    useEffect(() => {
+        if (view !== "history") {
+            return;
+        }
 
-        try {
+        let cancelled = false;
+
+        const fetchBookingHistory = async () => {
             const token =
                 localStorage.getItem("authToken");
 
-            const response = await api.get(
-                "/bookings/history",
-                {
-                    headers: token
-                        ? {
-                            Authorization:
-                                `Bearer ${token}`,
-                        }
-                        : {},
+            if (!token) {
+                if (!cancelled) {
+                    setBookingHistory([]);
+                    setHistoryLoading(false);
                 }
-            );
+                return;
+            }
 
-            setBookingHistory(
-                response.data?.bookings ||
-                response.data?.history ||
-                []
-            );
+            setHistoryLoading(true);
+            clearMessage();
 
-            setView("history");
-        } catch (error) {
-            showMessage(
-                error.response?.data?.message ||
-                "Unable to load booking history."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+            try {
+                const response =
+                    await api.get(
+                        "/bookings/history",
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`,
+                            },
+                        }
+                    );
+
+                if (cancelled) {
+                    return;
+                }
+
+                setBookingHistory(
+                    response.data?.bookings ||
+                    response.data?.orders ||
+                    response.data?.history ||
+                    []
+                );
+            } catch (error) {
+                if (cancelled) {
+                    return;
+                }
+
+                console.error(
+                    "Load booking history error:",
+                    error
+                );
+
+                showMessage(
+                    error.response?.data
+                        ?.message ||
+                    "Unable to load booking history."
+                );
+            } finally {
+                if (!cancelled) {
+                    setHistoryLoading(false);
+                }
+            }
+        };
+
+        fetchBookingHistory();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [view]);
 
 
     const logout = () => {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("authUser");
+        localStorage.removeItem(
+            "authToken"
+        );
+
+        localStorage.removeItem(
+            "authUser"
+        );
 
         window.dispatchEvent(
-            new Event("auth-user-changed")
+            new Event(
+                "auth-user-changed"
+            )
         );
 
         setAuthUser(null);
@@ -373,6 +574,7 @@ export default function AccountModal({
 
         setView("choose");
     };
+
 
 
     const renderView = () => {
@@ -420,10 +622,16 @@ export default function AccountModal({
                 <AdminLogin
                     username={adminUsername}
                     password={adminPassword}
-                    setUsername={setAdminUsername}
-                    setPassword={setAdminPassword}
+                    setUsername={
+                        setAdminUsername
+                    }
+                    setPassword={
+                        setAdminPassword
+                    }
                     loading={loading}
-                    onSubmit={submitAdminCredentials}
+                    onSubmit={
+                        submitAdminCredentials
+                    }
                 />
             );
         }
@@ -443,8 +651,10 @@ export default function AccountModal({
             return (
                 <UserAccount
                     user={authUser}
-                    onCart={loadCart}
-                    onHistory={loadBookingHistory}
+                    onCart={openCart}
+                    onHistory={
+                        openBookingHistory
+                    }
                     onLogout={logout}
                 />
             );
@@ -464,6 +674,9 @@ export default function AccountModal({
                 <CartView
                     items={cartItems}
                     onBack={goBack}
+                    onCartUpdated={() =>
+                        loadCart(false)
+                    }
                 />
             );
         }
@@ -472,6 +685,7 @@ export default function AccountModal({
             return (
                 <BookingHistory
                     bookings={bookingHistory}
+                    loading={historyLoading}
                     onBack={goBack}
                 />
             );
@@ -479,7 +693,6 @@ export default function AccountModal({
 
         return null;
     };
-
 
     return (
         <div
@@ -506,19 +719,23 @@ export default function AccountModal({
                             {view === "user" &&
                                 "User Sign In"}
 
-                            {view === "user-otp" &&
+                            {view ===
+                                "user-otp" &&
                                 "Verify Mobile"}
 
                             {view === "admin" &&
                                 "Administrator Login"}
 
-                            {view === "admin-otp" &&
+                            {view ===
+                                "admin-otp" &&
                                 "Administrator OTP"}
 
-                            {view === "user-account" &&
+                            {view ===
+                                "user-account" &&
                                 "My Account"}
 
-                            {view === "admin-account" &&
+                            {view ===
+                                "admin-account" &&
                                 "Administrator"}
 
                             {view === "cart" &&
@@ -559,18 +776,22 @@ export default function AccountModal({
                 <div className="p-6 overflow-y-auto">
                     {message && (
                         <div
-                            className={`mb-5 flex items-start gap-2 p-3 rounded-xl text-sm ${messageType === "success"
+                            className={`mb-5 flex items-start gap-2 p-3 rounded-xl text-sm ${messageType ===
+                                "success"
                                 ? "bg-primary-fixed/30 text-primary"
                                 : "bg-red-50 text-red-700"
                                 }`}
                         >
                             <span className="material-symbols-outlined text-[19px] shrink-0">
-                                {messageType === "success"
+                                {messageType ===
+                                    "success"
                                     ? "check_circle"
                                     : "error"}
                             </span>
 
-                            <span>{message}</span>
+                            <span>
+                                {message}
+                            </span>
                         </div>
                     )}
 
@@ -580,6 +801,7 @@ export default function AccountModal({
         </div>
     );
 }
+
 
 function AccountChooser({
     onUser,
@@ -599,7 +821,9 @@ function AccountChooser({
                 </h3>
 
                 <p className="mt-2 text-sm text-on-surface-variant">
-                    Sign in to access your bookings, cart and account.
+                    Sign in to access your
+                    bookings, cart and
+                    account.
                 </p>
             </div>
 
@@ -620,7 +844,8 @@ function AccountChooser({
                     </span>
 
                     <span className="block text-xs text-outline mt-1">
-                        Sign in with mobile number + OTP
+                        Sign in with mobile
+                        number + OTP
                     </span>
                 </span>
 
@@ -654,7 +879,8 @@ function AccountChooser({
                     </span>
 
                     <span className="block text-xs text-outline mt-1">
-                        Username + password + OTP
+                        Username + password
+                        + OTP
                     </span>
                 </span>
 
@@ -687,8 +913,10 @@ function UserMobileLogin({
                 </h3>
 
                 <p className="mt-2 text-sm text-on-surface-variant">
-                    No password or registration is required. We'll
-                    verify your mobile number with a one-time
+                    No password or
+                    registration is required.
+                    We'll verify your mobile
+                    number with a one-time
                     password.
                 </p>
             </div>
@@ -712,8 +940,14 @@ function UserMobileLogin({
                         onChange={(event) =>
                             setMobile(
                                 event.target.value
-                                    .replace(/\D/g, "")
-                                    .slice(0, 10)
+                                    .replace(
+                                        /\D/g,
+                                        ""
+                                    )
+                                    .slice(
+                                        0,
+                                        10
+                                    )
                             )
                         }
                         placeholder="Enter mobile number"
@@ -740,8 +974,9 @@ function UserMobileLogin({
             </button>
 
             <p className="text-center text-xs text-outline">
-                By continuing, you agree to use the mobile number
-                for account verification and booking services.
+                By continuing, you agree to use
+                the mobile number for account
+                verification and booking services.
             </p>
         </div>
     );
@@ -770,7 +1005,8 @@ function UserOtpVerification({
                 </h3>
 
                 <p className="mt-2 text-sm text-on-surface-variant">
-                    Enter the 6-digit OTP sent to{" "}
+                    Enter the 6-digit OTP sent
+                    to{" "}
                     <strong className="text-on-surface">
                         +91 {mobile}
                     </strong>
@@ -814,6 +1050,7 @@ function UserOtpVerification({
 }
 
 
+
 function AdminLogin({
     username,
     password,
@@ -836,8 +1073,9 @@ function AdminLogin({
                 </h3>
 
                 <p className="mt-2 text-sm text-on-surface-variant">
-                    Enter your administrator credentials to
-                    continue to OTP verification.
+                    Enter your administrator
+                    credentials to continue to
+                    OTP verification.
                 </p>
             </div>
 
@@ -856,7 +1094,9 @@ function AdminLogin({
                         autoComplete="username"
                         value={username}
                         onChange={(event) =>
-                            setUsername(event.target.value)
+                            setUsername(
+                                event.target.value
+                            )
                         }
                         placeholder="Administrator username"
                         className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-outline-variant/60 bg-white outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
@@ -879,7 +1119,9 @@ function AdminLogin({
                         autoComplete="current-password"
                         value={password}
                         onChange={(event) =>
-                            setPassword(event.target.value)
+                            setPassword(
+                                event.target.value
+                            )
                         }
                         placeholder="Administrator password"
                         className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-outline-variant/60 bg-white outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
@@ -910,8 +1152,10 @@ function AdminLogin({
                 </span>
 
                 <span>
-                    Administrator access is protected by username,
-                    password and one-time-password authentication.
+                    Administrator access is
+                    protected by username,
+                    password and one-time-password
+                    authentication.
                 </span>
             </div>
         </div>
@@ -939,8 +1183,8 @@ function AdminOtpVerification({
                 </h3>
 
                 <p className="mt-2 text-sm text-on-surface-variant">
-                    Enter the 6-digit administrator OTP to complete
-                    sign in.
+                    Enter the 6-digit administrator
+                    OTP to complete sign in.
                 </p>
             </div>
 
@@ -1022,24 +1266,29 @@ function OtpInput({
                     input?.focus();
                 }}
             >
-                {digits.split("").map(
-                    (digit, index) => (
-                        <span
-                            key={index}
-                            className={`w-10 h-12 sm:w-11 sm:h-13 rounded-xl border flex items-center justify-center text-xl font-bold ${digit.trim()
-                                ? "border-primary bg-primary/5 text-primary"
-                                : "border-outline-variant/60 bg-white text-outline"
-                                }`}
-                        >
-                            {digit.trim() || ""}
-                        </span>
-                    )
-                )}
+                {digits
+                    .split("")
+                    .map(
+                        (
+                            digit,
+                            index
+                        ) => (
+                            <span
+                                key={index}
+                                className={`w-10 h-12 sm:w-11 sm:h-13 rounded-xl border flex items-center justify-center text-xl font-bold ${digit.trim()
+                                    ? "border-primary bg-primary/5 text-primary"
+                                    : "border-outline-variant/60 bg-white text-outline"
+                                    }`}
+                            >
+                                {digit.trim() ||
+                                    ""}
+                            </span>
+                        )
+                    )}
             </div>
         </label>
     );
 }
-
 
 function UserAccount({
     user,
@@ -1206,7 +1455,6 @@ function AdminAccount({
     );
 }
 
-
 function AccountIdentity({
     user,
     icon,
@@ -1251,30 +1499,363 @@ function AccountIdentity({
 }
 
 
+
 function CartView({
     items,
     onBack,
+    onCartUpdated,
 }) {
+    const [isPaying, setIsPaying] =
+        useState(false);
+
     const total = items.reduce(
         (sum, item) =>
             sum +
-            Number(item.price || 0) *
-            Number(item.quantity || 1),
+            Number(item.price) *
+            Number(item.quantity),
         0
     );
 
-    return (
-        <div className="space-y-4 pt-3">
-            <div className="flex items-center justify-between">
-                <p className="text-sm text-on-surface-variant">
-                    {items.length} item
-                    {items.length === 1 ? "" : "s"} in your cart
-                </p>
 
-                <span className="text-xs font-bold uppercase tracking-wider text-outline">
-                    Cart
-                </span>
-            </div>
+    const buyNow = async () => {
+        if (!items.length || isPaying) {
+            return;
+        }
+
+        try {
+            setIsPaying(true);
+
+            const token =
+                localStorage.getItem(
+                    "authToken"
+                );
+
+            if (!token) {
+                setIsPaying(false);
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "open-account-modal",
+                        {
+                            detail: {
+                                view: "choose",
+                            },
+                        }
+                    )
+                );
+
+                return;
+            }
+            const orderResponse =
+                await api.post(
+                    "/cart-payment/create-order",
+                    {},
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                        },
+                    }
+                );
+
+            const order =
+                orderResponse.data;
+
+            console.log(
+                "Cart payment order:",
+                order
+            );
+
+            if (
+                !order?.razorpayOrderId
+            ) {
+                throw new Error(
+                    "Razorpay order ID was not returned by the server."
+                );
+            }
+
+            if (
+                !order?.razorpayKeyId
+            ) {
+                throw new Error(
+                    "Razorpay key was not returned by the server."
+                );
+            }
+
+
+            if (!window.Razorpay) {
+                throw new Error(
+                    "Razorpay Checkout is not loaded. Please refresh the page."
+                );
+            }
+
+            const options = {
+                key: order.razorpayKeyId,
+
+                amount:
+                    order.amountPaise,
+
+                currency:
+                    order.currency ||
+                    "INR",
+
+                name: "Manipur Tourism",
+
+                description:
+                    "Culture & Heritage Items",
+
+                order_id:
+                    order.razorpayOrderId,
+
+                handler:
+                    async function (
+                        response
+                    ) {
+                        try {
+                            const verifyResponse =
+                                await api.post(
+                                    "/cart-payment/verify-payment",
+                                    {
+                                        orderId:
+                                            order.orderId,
+
+                                        razorpay_order_id:
+                                            response.razorpay_order_id,
+
+                                        razorpay_payment_id:
+                                            response.razorpay_payment_id,
+
+                                        razorpay_signature:
+                                            response.razorpay_signature,
+                                    },
+                                    {
+                                        headers: {
+                                            Authorization:
+                                                `Bearer ${token}`,
+                                        },
+                                    }
+                                );
+
+                            console.log(
+                                "Payment verification:",
+                                verifyResponse.data
+                            );
+
+                            if (
+                                verifyResponse
+                                    .data
+                                    ?.success !==
+                                false
+                            ) {
+                                alert(
+                                    "Payment successful!"
+                                );
+
+                                /*
+                                 * Backend clears the cart
+                                 * after successful payment
+                                 * verification.
+                                 */
+                                if (
+                                    onCartUpdated
+                                ) {
+                                    await onCartUpdated();
+                                }
+
+                                /*
+                                 * Notify other components.
+                                 */
+                                window.dispatchEvent(
+                                    new Event(
+                                        "cart-updated"
+                                    )
+                                );
+                            }
+                        } catch (error) {
+                            console.error(
+                                "Payment verification error:",
+                                error
+                            );
+
+                            alert(
+                                error
+                                    .response
+                                    ?.data
+                                    ?.message ||
+                                error.message ||
+                                "Payment verification failed."
+                            );
+                        } finally {
+                            setIsPaying(
+                                false
+                            );
+                        }
+                    },
+
+                modal: {
+                    ondismiss:
+                        async () => {
+                            /*
+                             * Closing the Razorpay
+                             * window does NOT clear
+                             * the cart.
+                             */
+                            setIsPaying(
+                                false
+                            );
+
+                            try {
+                                await api.post(
+                                    "/cart-payment/payment-failed",
+                                    {
+                                        orderId:
+                                            order.orderId,
+                                    },
+                                    {
+                                        headers: {
+                                            Authorization:
+                                                `Bearer ${token}`,
+                                        },
+                                    }
+                                );
+                            } catch (error) {
+                                console.error(
+                                    "Failed to record payment status:",
+                                    error
+                                );
+                            }
+                        },
+                },
+
+                theme: {
+                    color: "#004335",
+                },
+            };
+
+            const razorpay =
+                new window.Razorpay(
+                    options
+                );
+
+            razorpay.on(
+                "payment.failed",
+                async function (
+                    response
+                ) {
+                    console.error(
+                        "Razorpay payment failed:",
+                        response.error
+                    );
+
+                    try {
+                        await api.post(
+                            "/cart-payment/payment-failed",
+                            {
+                                orderId:
+                                    order.orderId,
+                            },
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${token}`,
+                                },
+                            }
+                        );
+                    } catch (error) {
+                        console.error(
+                            "Failed to record payment failure:",
+                            error
+                        );
+                    }
+
+                    alert(
+                        response.error
+                            ?.description ||
+                        "Payment failed. Please try again."
+                    );
+
+                    setIsPaying(
+                        false
+                    );
+                }
+            );
+
+            razorpay.open();
+        } catch (error) {
+            console.error(
+                "Buy Now error:",
+                error
+            );
+
+            console.error(
+                "Server response:",
+                error.response?.data
+            );
+
+            alert(
+                error.response?.data
+                    ?.message ||
+                error.message ||
+                "Unable to create payment order."
+            );
+
+            setIsPaying(false);
+        }
+    };
+
+    const removeItem = async (
+        itemId
+    ) => {
+        try {
+            const token =
+                localStorage.getItem(
+                    "authToken"
+                );
+
+            if (!token) {
+                return;
+            }
+
+            await api.delete(
+                `/cart/${itemId}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
+
+            /*
+             * Refresh the cart from MongoDB.
+             */
+            if (onCartUpdated) {
+                await onCartUpdated();
+            }
+
+            /*
+             * Notify other components.
+             */
+            window.dispatchEvent(
+                new Event("cart-updated")
+            );
+        } catch (error) {
+            console.error(
+                "Remove cart item error:",
+                error
+            );
+
+            alert(
+                error.response?.data
+                    ?.message ||
+                "Unable to remove item."
+            );
+        }
+    };
+
+    return (
+        <div className="space-y-5 pt-3">
+            {/* CART ITEMS */}
 
             {items.length === 0 ? (
                 <div className="text-center py-10">
@@ -1289,73 +1870,118 @@ function CartView({
                     </h3>
 
                     <p className="mt-1 text-sm text-on-surface-variant">
-                        Items you add to your cart will appear here.
+                        Add cultural and
+                        heritage items to your
+                        cart to purchase them.
                     </p>
                 </div>
             ) : (
                 <>
-                    <div className="space-y-2">
-                        {items.map((item, index) => (
-                            <div
-                                key={
-                                    item._id ||
-                                    item.itemId ||
-                                    index
-                                }
-                                className="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low"
-                            >
-                                {item.image ? (
-                                    <img
-                                        src={item.image}
-                                        alt={
-                                            item.name ||
-                                            "Cart item"
-                                        }
-                                        className="w-14 h-14 rounded-lg object-cover shrink-0"
-                                    />
-                                ) : (
-                                    <div className="w-14 h-14 rounded-lg bg-primary-fixed/30 flex items-center justify-center shrink-0">
-                                        <span className="material-symbols-outlined text-primary">
-                                            inventory_2
-                                        </span>
+                    <div className="space-y-3">
+                        {items.map(
+                            (item) => (
+                                <div
+                                    key={
+                                        item.itemId
+                                    }
+                                    className="p-4 rounded-2xl bg-surface-container-low"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-on-surface">
+                                                {
+                                                    item.name
+                                                }
+                                            </h3>
+
+                                            <p className="text-sm text-on-surface-variant mt-1">
+                                                ₹
+                                                {Number(
+                                                    item.price
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                )}
+                                                {" × "}
+                                                {
+                                                    item.quantity
+                                                }
+                                            </p>
+                                        </div>
+
+                                        <div className="text-right shrink-0">
+                                            <strong className="block text-primary">
+                                                ₹
+                                                {(
+                                                    Number(
+                                                        item.price
+                                                    ) *
+                                                    Number(
+                                                        item.quantity
+                                                    )
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                )}
+                                            </strong>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeItem(
+                                                        item.itemId
+                                                    )
+                                                }
+                                                className="mt-2 text-xs font-bold text-red-600 hover:text-red-700"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
                                     </div>
-                                )}
-
-                                <div className="min-w-0 flex-1">
-                                    <p className="font-semibold truncate">
-                                        {item.name ||
-                                            "Tourism item"}
-                                    </p>
-
-                                    <p className="text-xs text-outline mt-1">
-                                        Qty:{" "}
-                                        {item.quantity || 1}
-                                    </p>
                                 </div>
-
-                                <p className="font-bold text-primary">
-                                    ₹
-                                    {(
-                                        Number(item.price || 0) *
-                                        Number(item.quantity || 1)
-                                    ).toLocaleString("en-IN")}
-                                </p>
-                            </div>
-                        ))}
+                            )
+                        )}
                     </div>
 
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-primary text-white">
-                        <span className="font-semibold">
+                    {/* TOTAL */}
+
+                    <div className="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+                        <span className="font-bold text-on-surface">
                             Total
                         </span>
 
-                        <span className="text-lg font-bold">
+                        <strong className="text-xl font-bold text-primary">
                             ₹
-                            {total.toLocaleString("en-IN")}
-                        </span>
+                            {total.toLocaleString(
+                                "en-IN"
+                            )}
+                        </strong>
                     </div>
+
+                    {/* BUY NOW */}
+
+                    <button
+                        type="button"
+                        onClick={buyNow}
+                        disabled={
+                            isPaying
+                        }
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-container disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <span className="material-symbols-outlined">
+                            {isPaying
+                                ? "progress_activity"
+                                : "shopping_bag"}
+                        </span>
+
+                        {isPaying
+                            ? "Processing Payment..."
+                            : `Buy Now • ₹${total.toLocaleString(
+                                "en-IN"
+                            )}`}
+                    </button>
                 </>
             )}
+
+            {/* BACK */}
 
             <button
                 type="button"
@@ -1371,11 +1997,28 @@ function CartView({
 
 function BookingHistory({
     bookings,
+    loading,
     onBack,
 }) {
     return (
         <div className="space-y-4 pt-3">
-            {bookings.length === 0 ? (
+            {loading ? (
+                <div className="text-center py-10">
+                    <div className="mx-auto w-14 h-14 rounded-full bg-surface-container-low flex items-center justify-center">
+                        <span className="material-symbols-outlined text-3xl text-primary animate-spin">
+                            progress_activity
+                        </span>
+                    </div>
+
+                    <h3 className="mt-4 font-bold text-lg">
+                        Loading booking history
+                    </h3>
+
+                    <p className="mt-1 text-sm text-on-surface-variant">
+                        Fetching your latest orders...
+                    </p>
+                </div>
+            ) : bookings.length === 0 ? (
                 <div className="text-center py-10">
                     <div className="mx-auto w-14 h-14 rounded-full bg-surface-container-low flex items-center justify-center">
                         <span className="material-symbols-outlined text-3xl text-outline">
@@ -1388,61 +2031,108 @@ function BookingHistory({
                     </h3>
 
                     <p className="mt-1 text-sm text-on-surface-variant">
-                        Your confirmed tourism bookings will
-                        appear here.
+                        Your tourism purchases will appear here.
                     </p>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {bookings.map((booking, index) => (
-                        <div
-                            key={
-                                booking._id ||
-                                booking.bookingReference ||
-                                booking.reference ||
-                                index
-                            }
-                            className="p-4 rounded-2xl bg-surface-container-low"
-                        >
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                    <p className="font-bold truncate">
-                                        {booking.title ||
-                                            booking.bookingType ||
-                                            "Tourism Booking"}
-                                    </p>
+                    {bookings.map((order, index) => {
+                        const items = Array.isArray(order.items)
+                            ? order.items
+                            : [];
 
-                                    <p className="text-xs text-outline mt-1">
-                                        Reference:{" "}
-                                        {booking.bookingReference ||
-                                            booking.reference ||
-                                            "—"}
-                                    </p>
+                        const totalItems = items.reduce(
+                            (total, item) =>
+                                total + Number(item.quantity || 0),
+                            0
+                        );
+
+                        const firstItem = items[0];
+
+                        const orderTitle =
+                            firstItem?.name ||
+                            (totalItems > 1
+                                ? `${totalItems} Tourism Items`
+                                : "Tourism Booking");
+
+                        const reference =
+                            order.receipt ||
+                            order.razorpayOrderId ||
+                            order._id ||
+                            "—";
+
+                        return (
+                            <div
+                                key={
+                                    order._id ||
+                                    order.razorpayOrderId ||
+                                    order.receipt ||
+                                    index
+                                }
+                                className="p-4 rounded-2xl bg-surface-container-low"
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="font-bold truncate">
+                                            {orderTitle}
+                                        </p>
+
+                                        {totalItems > 1 && (
+                                            <p className="text-xs text-outline mt-1">
+                                                {totalItems} items
+                                            </p>
+                                        )}
+
+                                        <p className="text-xs text-outline mt-1 break-all">
+                                            Reference: {reference}
+                                        </p>
+                                    </div>
+
+                                    <BookingStatus
+                                        status={order.status}
+                                    />
                                 </div>
 
-                                <BookingStatus
-                                    status={booking.status}
-                                />
-                            </div>
+                                <div className="mt-3 flex items-center justify-between text-sm">
+                                    <span className="text-on-surface-variant">
+                                        {order.createdAt
+                                            ? new Date(
+                                                order.createdAt
+                                            ).toLocaleDateString(
+                                                "en-IN",
+                                                {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                }
+                                            )
+                                            : "Date unavailable"}
+                                    </span>
 
-                            <div className="mt-3 flex items-center justify-between text-sm">
-                                <span className="text-on-surface-variant">
-                                    {booking.bookingDate
-                                        ? new Date(
-                                            booking.bookingDate
-                                        ).toLocaleDateString("en-IN")
-                                        : "Date unavailable"}
-                                </span>
+                                    <span className="font-bold text-primary">
+                                        ₹
+                                        {Number(
+                                            order.amount || 0
+                                        ).toLocaleString("en-IN")}
+                                    </span>
+                                </div>
 
-                                <span className="font-bold text-primary">
-                                    ₹
-                                    {Number(
-                                        booking.amount || 0
-                                    ).toLocaleString("en-IN")}
-                                </span>
+                                {order.razorpayPaymentId && (
+                                    <div className="mt-3 pt-3 border-t border-outline-variant/30">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <span className="text-xs text-outline">
+                                                Payment ID
+                                            </span>
+
+                                            <span className="text-xs font-medium text-on-surface-variant text-right break-all">
+                                                {order.razorpayPaymentId}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 
@@ -1457,12 +2147,39 @@ function BookingHistory({
     );
 }
 
-function BookingStatus({ status }) {
+
+function BookingStatus({
+    status,
+}) {
     const normalized = String(
         status || "pending"
     ).toLowerCase();
 
     const config = {
+        paid: {
+            label: "Paid",
+            className:
+                "bg-primary-fixed/50 text-primary",
+        },
+
+        pending: {
+            label: "Pending",
+            className:
+                "bg-tertiary-fixed text-tertiary",
+        },
+
+        failed: {
+            label: "Failed",
+            className:
+                "bg-red-50 text-red-700",
+        },
+
+        cancelled: {
+            label: "Cancelled",
+            className:
+                "bg-red-50 text-red-700",
+        },
+
         confirmed: {
             label: "Confirmed",
             className:
@@ -1474,22 +2191,11 @@ function BookingStatus({ status }) {
             className:
                 "bg-primary-fixed/50 text-primary",
         },
-
-        cancelled: {
-            label: "Cancelled",
-            className:
-                "bg-red-50 text-red-700",
-        },
-
-        pending: {
-            label: "Pending",
-            className:
-                "bg-tertiary-fixed text-tertiary",
-        },
     };
 
     const current =
-        config[normalized] || config.pending;
+        config[normalized] ||
+        config.pending;
 
     return (
         <span

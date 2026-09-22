@@ -1,5 +1,5 @@
 import EILPBooking from "../models/EILPBooking.js";
-
+import Order from "../models/Order.js";
 const EMPTY_COUNTS = {
     eilp: 0,
     product: 0,
@@ -43,15 +43,17 @@ export const getAdminDashboard = async (req, res) => {
 
         const eilp =
             await EILPBooking.countDocuments();
-
+        const product = await Order.countDocuments();
         return res.json({
             counts: {
                 ...EMPTY_COUNTS,
                 eilp,
+                product,
             },
 
             configuredCollections: [
                 "eilp",
+                "product",
             ],
 
             pendingCollections: [
@@ -250,6 +252,85 @@ export const getAdminEILPBookings = async (req, res) => {
             message:
                 "Unable to load e-ILP booking records.",
 
+        });
+    }
+};
+
+export const getAdminProductBookings = async (req, res) => {
+    try {
+        const requestedPage =
+            Number.parseInt(req.query.page, 10) || 1;
+
+        const requestedLimit =
+            Number.parseInt(req.query.limit, 10) || 5;
+
+        const page = Math.max(requestedPage, 1);
+        const limit = Math.min(
+            Math.max(requestedLimit, 1),
+            50
+        );
+
+        const search =
+            String(req.query.search || "").trim();
+
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+                {
+                    razorpayOrderId: {
+                        $regex: search,
+                        $options: "i",
+                    },
+                },
+                {
+                    razorpayPaymentId: {
+                        $regex: search,
+                        $options: "i",
+                    },
+                },
+                {
+                    "items.name": {
+                        $regex: search,
+                        $options: "i",
+                    },
+                },
+            ];
+        }
+
+        const [total, records] = await Promise.all([
+            Order.countDocuments(filter),
+
+            Order.find(filter)
+                .populate(
+                    "user",
+                    "name phone email"
+                )
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean(),
+        ]);
+
+        return res.json({
+            records,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit),
+            },
+        });
+
+    } catch (error) {
+        console.error(
+            "Admin product bookings error:",
+            error
+        );
+
+        return res.status(500).json({
+            message:
+                "Unable to load product booking records.",
         });
     }
 };

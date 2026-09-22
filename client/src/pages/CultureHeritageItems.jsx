@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Telemetry from '../components/home/TelemetryBar';
+import api from '../services/api.js';
 const stories = {
     phanek: {
         title: "Phanek Mayek Naibi Heritage",
@@ -83,10 +84,7 @@ const CultureHeritageItems = () => {
         const authToken = localStorage.getItem("authToken");
         const authUser = localStorage.getItem("authUser");
 
-        // User is NOT logged in
         if (!authToken || !authUser) {
-            // Save the item temporarily so it can be added
-            // automatically after successful login.
             localStorage.setItem(
                 "pendingCartItem",
                 JSON.stringify({
@@ -95,7 +93,6 @@ const CultureHeritageItems = () => {
                 })
             );
 
-            // Tell Navbar to open the login/account modal
             window.dispatchEvent(
                 new CustomEvent("open-account-modal", {
                     detail: {
@@ -107,46 +104,65 @@ const CultureHeritageItems = () => {
             return;
         }
 
-        // User IS logged in
         addAuthenticatedItemToCart(title, price);
     };
     const addAuthenticatedItemToCart = async (title, price) => {
         try {
-            const authToken = localStorage.getItem("authToken");
+            const token = localStorage.getItem("authToken");
 
-            if (!authToken) {
+            if (!token) {
                 return;
             }
 
-            // We will connect this to your actual cart API here.
-            // Do not show "Added" until the backend confirms success.
+            const response = await api.post(
+                "/cart",
+                {
+                    title,
+                    price,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-            setToast({
-                show: true,
-                title: `${title} Added`,
-                sub: `₹${price.toLocaleString()} allocated directly to weaver`
-            });
+            if (response.data) {
+                setToast({
+                    show: true,
+                    title: `${title} Added`,
+                    sub: `₹${price.toLocaleString()} allocated directly to weaver`,
+                });
 
-            setTimeout(() => {
-                setToast(prev => ({
-                    ...prev,
-                    show: false
-                }));
-            }, 3200);
+                window.dispatchEvent(
+                    new Event("cart-updated")
+                );
 
+                setTimeout(() => {
+                    setToast((prev) => ({
+                        ...prev,
+                        show: false,
+                    }));
+                }, 3200);
+            }
         } catch (error) {
-            console.error("Add to cart error:", error);
+            console.error(
+                "Add to cart error:",
+                error
+            );
 
             setToast({
                 show: true,
                 title: "Unable to Add",
-                sub: "Please try again."
+                sub:
+                    error.response?.data?.message ||
+                    "Please try again.",
             });
 
             setTimeout(() => {
-                setToast(prev => ({
+                setToast((prev) => ({
                     ...prev,
-                    show: false
+                    show: false,
                 }));
             }, 3200);
         }
