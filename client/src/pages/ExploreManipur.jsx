@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-
+import TelemetryBar from '../components/home/TelemetryBar.jsx';
 const circuits = [
     {
         id: 'cir-01',
@@ -512,222 +512,186 @@ export default function ExploreManipur() {
         setDuration('all');
     };
     return (
-        <main className="w-full pt-20 bg-surface min-h-screen">
-            <TelemetryStrip />
-            <section className="w-full bg-surface-container-low/60 pt-8 pb-10 px-5 md:px-12">
-                <div className="max-w-[1320px] mx-auto">
-                    <nav className="flex items-center gap-2 mb-4 text-outline font-label-md text-label-sm">
-                        <a className="hover:text-primary transition-colors" href="/">
-                            Home
-                        </a>
-                        <span className="material-symbols-outlined text-[14px]">
-                            chevron_right
-                        </span>
-                        <span>Protected Circuits</span>
-                        <span className="material-symbols-outlined text-[14px]">
-                            chevron_right
-                        </span>
-                        <span className="text-primary font-bold">
-                            All 18 Corridors Directory
-                        </span>
-                    </nav>
-                    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
-                        <div className="max-w-3xl">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary mb-3">
-                                <span className="material-symbols-outlined text-[16px]">
-                                    park
-                                </span>
-                                <span className="font-label-sm text-label-sm tracking-wider uppercase font-bold">
-                                    Ecological Heritage Registry
-                                </span>
-                            </div>
-                            <h1 className="font-display-lg text-headline-lg md:text-display-lg text-primary tracking-tight font-bold">
-                                All 18 Protected Circuits of Manipur
-                            </h1>
-                            <p className="font-body-lg text-body-lg text-on-surface-variant mt-3 leading-relaxed">
-                                Explore state-protected sacred hill sanctuaries, Ramsar wetland corridors, WWII peace heritage lines, and indigenous bio-cultural reserves strictly managed under ecological carrying capacity frameworks.
-                            </p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
-                            <div className="flex items-center gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-sm">
-                                <div className="w-10 h-10 rounded-lg bg-primary-container/15 flex items-center justify-center text-primary-container">
-                                    <span className="material-symbols-outlined text-[24px]">
-                                        verified_user
-                                    </span>
-                                </div>
-                                <div>
-                                    <div className="font-label-sm text-label-sm text-outline uppercase font-semibold">
-                                        Regulated Access
-                                    </div>
-                                    <div className="font-headline-sm text-headline-sm text-primary font-bold">
-                                        100% Bio-Audited
-                                    </div>
-                                </div>
-                            </div>
-                            <a
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-secondary/95 shadow-sm transition-all"
-                                href="#permit-advisory"
-                            >
-                                <span className="material-symbols-outlined text-[18px]">
-                                    badge
-                                </span>
-                                Inner Line Permit (e-ILP) Guidelines
+        <>
+            <TelemetryBar />
+            <main className="w-full pt-20 bg-surface min-h-screen">
+                <section className="w-full bg-surface-container-low/60 pt-8 pb-10 px-5 md:px-12">
+                    <div className="max-w-[1320px] mx-auto">
+                        <nav className="flex items-center gap-2 mb-4 text-outline font-label-md text-label-sm">
+                            <a className="hover:text-primary transition-colors" href="/">
+                                Home
                             </a>
-                        </div>
-                    </div>
-                    <div className="bg-surface-container-lowest rounded-2xl p-4 md:p-6 shadow-[0_4px_24px_-2px_rgba(10,92,74,0.08)] flex flex-col gap-5">
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[22px]">
-                                search
+                            <span className="material-symbols-outlined text-[14px]">
+                                chevron_right
                             </span>
-                            <input
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                className="w-full pl-12 pr-10 py-3.5 bg-surface-container-low rounded-xl text-on-surface font-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all"
-                                placeholder="Search circuit by name, district (e.g. Ukhrul, Bishnupur, Tamenglong, Imphal...), or keyword..."
-                            />
-                            {search &&
-                                <button
-                                    type="button"
-                                    onClick={() => setSearch('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-outline"
-                                >
+                            <span>Protected Circuits</span>
+                            <span className="material-symbols-outlined text-[14px]">
+                                chevron_right
+                            </span>
+                            <span className="text-primary font-bold">
+                                All 18 Corridors Directory
+                            </span>
+                        </nav>
+                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+                            <div className="max-w-3xl">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary mb-3">
                                     <span className="material-symbols-outlined text-[16px]">
-                                        close
+                                        park
                                     </span>
-                                </button>}
-                        </div>
-                        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
-                            {categories.map(([v, l]) => (
-                                <button
-                                    key={v}
-                                    type="button"
-                                    onClick={() => setCategory(v)}
-                                    className={`shrink-0 px-4 py-2 rounded-full font-label-md text-label-md transition-all ${category === v ? 'bg-primary-container text-on-primary shadow-sm' : 'bg-surface-container-low text-on-surface hover:bg-surface-container'}`}
+                                    <span className="font-label-sm text-label-sm tracking-wider uppercase font-bold">
+                                        Ecological Heritage Registry
+                                    </span>
+                                </div>
+                                <h1 className="font-display-lg text-headline-lg md:text-display-lg text-primary tracking-tight font-bold">
+                                    All 18 Protected Circuits of Manipur
+                                </h1>
+                                <p className="font-body-lg text-body-lg text-on-surface-variant mt-3 leading-relaxed">
+                                    Explore state-protected sacred hill sanctuaries, Ramsar wetland corridors, WWII peace heritage lines, and indigenous bio-cultural reserves strictly managed under ecological carrying capacity frameworks.
+                                </p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
+                                <div className="flex items-center gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+                                    <div className="w-10 h-10 rounded-lg bg-primary-container/15 flex items-center justify-center text-primary-container">
+                                        <span className="material-symbols-outlined text-[24px]">
+                                            verified_user
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div className="font-label-sm text-label-sm text-outline uppercase font-semibold">
+                                            Regulated Access
+                                        </div>
+                                        <div className="font-headline-sm text-headline-sm text-primary font-bold">
+                                            100% Bio-Audited
+                                        </div>
+                                    </div>
+                                </div>
+                                <a
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-secondary/95 shadow-sm transition-all"
+                                    href="#permit-advisory"
                                 >
-                                    {l}
-                                </button>
-                            ))}
+                                    <span className="material-symbols-outlined text-[18px]">
+                                        badge
+                                    </span>
+                                    Inner Line Permit (e-ILP) Guidelines
+                                </a>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-surface-container-high/60">
-                            <Select
-                                label="District Domain"
-                                value={district}
-                                onChange={setDistrict}
-                                options={districts.map(d => [
-                                    d,
-                                    d === 'all'
-                                        ? 'All 16 Districts'
-                                        : d === 'Tengnoupal' ? 'Tengnoupal / Moreh' : d,
-                                ])}
-                            />
-                            <Select
-                                label="Permit Clearance"
-                                value={permit}
-                                onChange={setPermit}
-                                options={permits}
-                            />
-                            <Select
-                                label="Expedition Scale"
-                                value={duration}
-                                onChange={setDuration}
-                                options={durations}
-                            />
-                        </div>
-                        <div className="flex items-center justify-between text-body-sm text-outline pt-1 gap-4">
-                            <span className="font-semibold text-primary">
-                                Showing {filtered.length} of 18 Protected Circuits
-                            </span>
-                            <button
-                                type="button"
-                                onClick={reset}
-                                className="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1 shrink-0"
-                            >
-                                <span className="material-symbols-outlined text-[14px]">
-                                    restart_alt
+                        <div className="bg-surface-container-lowest rounded-2xl p-4 md:p-6 shadow-[0_4px_24px_-2px_rgba(10,92,74,0.08)] flex flex-col gap-5">
+                            <div className="relative">
+                                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[22px]">
+                                    search
                                 </span>
-                                Reset Filters
-                            </button>
+                                <input
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                    className="w-full pl-12 pr-10 py-3.5 bg-surface-container-low rounded-xl text-on-surface font-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all"
+                                    placeholder="Search circuit by name, district (e.g. Ukhrul, Bishnupur, Tamenglong, Imphal...), or keyword..."
+                                />
+                                {search &&
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearch('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-outline"
+                                    >
+                                        <span className="material-symbols-outlined text-[16px]">
+                                            close
+                                        </span>
+                                    </button>}
+                            </div>
+                            <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
+                                {categories.map(([v, l]) => (
+                                    <button
+                                        key={v}
+                                        type="button"
+                                        onClick={() => setCategory(v)}
+                                        className={`shrink-0 px-4 py-2 rounded-full font-label-md text-label-md transition-all ${category === v ? 'bg-primary-container text-on-primary shadow-sm' : 'bg-surface-container-low text-on-surface hover:bg-surface-container'}`}
+                                    >
+                                        {l}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-surface-container-high/60">
+                                <Select
+                                    label="District Domain"
+                                    value={district}
+                                    onChange={setDistrict}
+                                    options={districts.map(d => [
+                                        d,
+                                        d === 'all'
+                                            ? 'All 16 Districts'
+                                            : d === 'Tengnoupal' ? 'Tengnoupal / Moreh' : d,
+                                    ])}
+                                />
+                                <Select
+                                    label="Permit Clearance"
+                                    value={permit}
+                                    onChange={setPermit}
+                                    options={permits}
+                                />
+                                <Select
+                                    label="Expedition Scale"
+                                    value={duration}
+                                    onChange={setDuration}
+                                    options={durations}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between text-body-sm text-outline pt-1 gap-4">
+                                <span className="font-semibold text-primary">
+                                    Showing {filtered.length} of 18 Protected Circuits
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={reset}
+                                    className="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1 shrink-0"
+                                >
+                                    <span className="material-symbols-outlined text-[14px]">
+                                        restart_alt
+                                    </span>
+                                    Reset Filters
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            <section className="w-full py-10 px-5 md:px-12 bg-surface">
-                <div className="max-w-[1320px] mx-auto">
-                    {filtered.length
-                        ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filtered.map(c => (
-                                <CircuitCard key={c.id} circuit={c} onWaypoints={setModal} />
-                            ))}
-                        </div>
-                        : <div className="text-center py-16 px-4 bg-surface-container-lowest rounded-2xl shadow-sm">
-                            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto mb-4 text-outline">
-                                <span className="material-symbols-outlined text-[32px]">
-                                    travel_explore
-                                </span>
+                </section>
+                <section className="w-full py-10 px-5 md:px-12 bg-surface">
+                    <div className="max-w-[1320px] mx-auto">
+                        {filtered.length
+                            ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filtered.map(c => (
+                                    <CircuitCard key={c.id} circuit={c} onWaypoints={setModal} />
+                                ))}
                             </div>
-                            <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
-                                No Protected Circuits Match Your Criteria
-                            </h3>
-                            <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-md mx-auto">
-                                Try clearing your search keyword, choosing "All 16 Districts", or resetting your filter pills.
-                            </p>
-                            <button
-                                type="button"
-                                onClick={reset}
-                                className="mt-6 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container transition-colors"
-                            >
-                                Reset All Filters
-                            </button>
-                        </div>}
-                </div>
-            </section>
-            <CapacitySection /><PermitSection />
-            {modal &&
-                <WaypointsModal title={modal} onClose={() => setModal(null)} />}
-        </main>
+                            : <div className="text-center py-16 px-4 bg-surface-container-lowest rounded-2xl shadow-sm">
+                                <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto mb-4 text-outline">
+                                    <span className="material-symbols-outlined text-[32px]">
+                                        travel_explore
+                                    </span>
+                                </div>
+                                <h3 className="font-headline-sm text-headline-sm text-primary font-bold">
+                                    No Protected Circuits Match Your Criteria
+                                </h3>
+                                <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-md mx-auto">
+                                    Try clearing your search keyword, choosing "All 16 Districts", or resetting your filter pills.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={reset}
+                                    className="mt-6 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container transition-colors"
+                                >
+                                    Reset All Filters
+                                </button>
+                            </div>}
+                    </div>
+                </section>
+                <CapacitySection /><PermitSection />
+                {modal &&
+                    <WaypointsModal title={modal} onClose={() => setModal(null)} />}
+            </main>
+        </>
+
     );
 }
 
-function TelemetryStrip() {
-    return (
-        <section className="w-full bg-primary text-on-primary py-2.5 px-5 md:px-12">
-            <div className="max-w-[1320px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-xs font-label-sm">
-                <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center gap-1.5 font-bold tracking-wider uppercase text-primary-fixed">
-                        <span className="w-2 h-2 rounded-full bg-tertiary-fixed animate-ping" />
-                        Live Monitored
-                    </span>
-                    <span className="hidden sm:inline text-outline-variant/40">|</span>
-                    <span className="text-on-primary/90 font-medium">
-                        18 Government-Notified Sanctuaries Active
-                    </span>
-                    <span className="hidden sm:inline text-outline-variant/40">|</span>
-                    <span className="text-on-primary/90 font-medium">
-                        Carrying Capacity:
-                        {' '}
-                        <strong className="text-primary-fixed">Optimal (Green)</strong>
-                    </span>
-                </div>
-                <div className="flex items-center gap-4 text-on-primary/80">
-                    <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[15px] text-tertiary-fixed">
-                            verified
-                        </span>
-                        Forest Dept & Tourism Directorate Verified
-                    </span>
-                    <span className="hidden md:inline text-outline-variant/40">|</span>
-                    <span className="hidden md:flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[15px] text-primary-fixed">
-                            recycling
-                        </span>
-                        Zero Plastic Protocol
-                    </span>
-                </div>
-            </div>
-        </section>
-    );
-}
 function Select({ label, value, onChange, options }) {
     return (
         <div className="relative">

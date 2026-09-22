@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-
+import Telemetry from "../components/home/TelemetryBar";
 const homestays = [
     {
         type: "Floating Phumdi",
@@ -401,632 +401,638 @@ export default function EcoHomestays() {
     };
 
     return (
-        <main className="w-full pt-20 bg-surface flex-1">
-            <div className="flex flex-col w-full">
-                {/* Top Context Sub-header */}
-                <section className="w-full bg-surface py-space-lg px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto flex flex-col gap-space-sm">
-                        <div className="flex flex-wrap items-center justify-between gap-space-sm">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-primary font-label-sm text-label-sm uppercase tracking-wider font-bold">
-                                <span className="material-symbols-outlined text-[14px]">
-                                    format_image_left
-                                </span>
-                                DIRECTORATE OF ECO-TOURISM & COMMUNITY MOBILITY • GOVT. OF
-                                MANIPUR
-                            </span>
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold">
-                                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                100% Direct Village Revenue Audit • Zero Middlemen • GST &
-                                e-ILP Synced
-                            </span>
-                        </div>
+        <>
+            <Telemetry />
+            <main className="w-full pt-20 bg-surface flex-1">
 
-                        <div className="mt-2 flex flex-col md:flex-row md:items-end justify-between gap-space-md">
-                            <div className="max-w-3xl">
-                                <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight font-bold">
-                                    Regenerative Stays, Guides & Green Cabs
-                                </h1>
-                                <p className="font-body-lg text-body-lg text-on-surface-variant mt-2">
-                                    Reserve indigenous floating phumdi eco-stays, certified local
-                                    naturalists, and Directorate-approved SOS-tracked electric
-                                    cabs across Manipur’s 16 districts.
-                                </p>
+                <div className="flex flex-col w-full">
+                    {/* Top Context Sub-header */}
+                    <section className="w-full bg-surface py-space-lg px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto flex flex-col gap-space-sm">
+                            <div className="flex flex-wrap items-center justify-between gap-space-sm">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-primary font-label-sm text-label-sm uppercase tracking-wider font-bold">
+                                    <span className="material-symbols-outlined text-[14px]">
+                                        format_image_left
+                                    </span>
+                                    DIRECTORATE OF ECO-TOURISM & COMMUNITY MOBILITY • GOVT. OF
+                                    MANIPUR
+                                </span>
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold">
+                                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                    100% Direct Village Revenue Audit • Zero Middlemen • GST &
+                                    e-ILP Synced
+                                </span>
                             </div>
 
-                            <div className="flex items-center gap-3 bg-surface-container-low px-4 py-2.5 rounded-xl self-start md:self-auto">
-                                <span className="material-symbols-outlined text-secondary text-[26px]">
-                                    energy_savings_leaf
-                                </span>
-                                <div className="flex flex-col">
-                                    <span className="font-label-sm text-label-sm text-outline uppercase tracking-wider">
-                                        Mission 2025
+                            <div className="mt-2 flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+                                <div className="max-w-3xl">
+                                    <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight font-bold">
+                                        Regenerative Stays, Guides & Green Cabs
+                                    </h1>
+                                    <p className="font-body-lg text-body-lg text-on-surface-variant mt-2">
+                                        Reserve indigenous floating phumdi eco-stays, certified local
+                                        naturalists, and Directorate-approved SOS-tracked electric
+                                        cabs across Manipur’s 16 districts.
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-3 bg-surface-container-low px-4 py-2.5 rounded-xl self-start md:self-auto">
+                                    <span className="material-symbols-outlined text-secondary text-[26px]">
+                                        energy_savings_leaf
                                     </span>
-                                    <span className="font-label-md text-label-md text-on-surface font-bold">
-                                        Net-Zero Tourism Grid
-                                    </span>
+                                    <div className="flex flex-col">
+                                        <span className="font-label-sm text-label-sm text-outline uppercase tracking-wider">
+                                            Mission 2025
+                                        </span>
+                                        <span className="font-label-md text-label-md text-on-surface font-bold">
+                                            Net-Zero Tourism Grid
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                {/* Unified Booking Console */}
-                <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <div className="flex flex-wrap items-center gap-2 mb-4" id="service-tabs">
-                            {[
-                                ["bundle", "verified", "All-in-One Tri-Bundle (Save 15%)"],
-                                ["stays", "home", "Eco-Homestays (68 verified)"],
-                                ["guides", "explore", "Certified Field Guides (142 licensed)"],
-                                ["cabs", "electric_bolt", "Green EV Cabs (95 fleets)"],
-                            ].map(([key, icon, label]) => (
+                    {/* Unified Booking Console */}
+                    <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <div className="flex flex-wrap items-center gap-2 mb-4" id="service-tabs">
+                                {[
+                                    ["bundle", "verified", "All-in-One Tri-Bundle (Save 15%)"],
+                                    ["stays", "home", "Eco-Homestays (68 verified)"],
+                                    ["guides", "explore", "Certified Field Guides (142 licensed)"],
+                                    ["cabs", "electric_bolt", "Green EV Cabs (95 fleets)"],
+                                ].map(([key, icon, label]) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => setActiveService(key)}
+                                        className={`px-5 py-2.5 rounded-full font-label-md text-label-md shadow-md flex items-center gap-2 transition-all ${activeService === key
+                                            ? "bg-primary-container text-on-primary"
+                                            : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+                                            }`}
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">
+                                            {icon}
+                                        </span>
+                                        <span>{label}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="p-space-lg rounded-2xl bg-surface-container-lowest shadow-md">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-md">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[16px] text-primary">
+                                                location_on
+                                            </span>
+                                            Destination / Circuit
+                                        </label>
+                                        <select
+                                            value={destination}
+                                            onChange={(e) => setDestination(e.target.value)}
+                                            className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        >
+                                            <option>Loktak Lake & Keibul Lamjao (Bishnupur)</option>
+                                            <option>Shirui Hills & Longpi Village (Ukhrul)</option>
+                                            <option>Imphal Royal Citadel & Andro Village</option>
+                                            <option>Dzükou Valley & Senapati Heights</option>
+                                            <option>Khuga Dam & Behiang Valley (Churachandpur)</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[16px] text-primary">
+                                                calendar_today
+                                            </span>
+                                            Check-in & Departure
+                                        </label>
+                                        <input
+                                            value={dateRange}
+                                            onChange={(e) => setDateRange(e.target.value)}
+                                            className="w-full h-12 pl-3 pr-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                            type="text"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[16px] text-primary">
+                                                group
+                                            </span>
+                                            Travelers & Stays
+                                        </label>
+                                        <select
+                                            value={travelers}
+                                            onChange={(e) => setTravelers(e.target.value)}
+                                            className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        >
+                                            <option>2 Adults, 1 Eco-Room</option>
+                                            <option>1 Adult, 1 Solo Pod</option>
+                                            <option>4 Adults, 2 Cottages (Family)</option>
+                                            <option>6+ Eco-Expedition Crew</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[16px] text-primary">
+                                                person_search
+                                            </span>
+                                            Field Naturalist
+                                        </label>
+                                        <select
+                                            value={guide}
+                                            onChange={(e) => setGuide(e.target.value)}
+                                            className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        >
+                                            <option>Indigenous Wildlife & Birding</option>
+                                            <option>High-Altitude Ridge Trekker</option>
+                                            <option>Kangla Historical & Epigraphy Scholar</option>
+                                            <option>Tangkhul Ethnobotanist & Forager</option>
+                                            <option>No Guide Required</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[16px] text-primary">
+                                                electric_car
+                                            </span>
+                                            EV Cab Allocation
+                                        </label>
+                                        <select
+                                            value={cab}
+                                            onChange={(e) => setCab(e.target.value)}
+                                            className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        >
+                                            <option>Airport Pick-up + 3 Days Circuit EV</option>
+                                            <option>Inter-District Transit Only</option>
+                                            <option>Point-to-Point Shuttle Only</option>
+                                            <option>Self-Drive EV Station Pass</option>
+                                            <option>No Transport Required</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="mt-space-md pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+                                        <span className="material-symbols-outlined text-primary text-[18px]">
+                                            check_circle
+                                        </span>
+                                        <span>
+                                            Includes mandatory ILP verification pre-clearance at Imphal
+                                            Airport
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={runSearch}
+                                        className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-[20px]">
+                                            search_insights
+                                        </span>
+                                        <span>Search Live Availability & Calculate Bundle Price</span>
+                                    </button>
+                                </div>
+
+                                {feedback && (
+                                    <div className="mt-4 p-3 rounded-lg bg-surface-container text-primary font-label-md text-label-md flex items-center justify-between gap-4">
+                                        <span>{feedback}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFeedback("")}
+                                            className="text-outline hover:text-primary"
+                                            aria-label="Dismiss"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Tri-Bundle Spotlight */}
+                    <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <div className="flex flex-col lg:flex-row items-stretch rounded-3xl bg-surface-container-lowest shadow-xl overflow-hidden">
+                                <div className="w-full lg:w-2/3 p-space-lg md:p-space-xl flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                                            <span className="px-3 py-1 rounded-full bg-secondary-container/30 text-secondary font-label-sm text-label-sm font-bold uppercase tracking-wider">
+                                                Directorate Curated Triple-Bundle
+                                            </span>
+                                            <span className="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">
+                                                Instant e-ILP Linked
+                                            </span>
+                                        </div>
+                                        <h2 className="font-headline-lg text-headline-lg text-primary font-bold">
+                                            Loktak Floating Haven & Brow-Antlered Deer Trail (3D/2N)
+                                        </h2>
+                                        <p className="font-body-md text-body-md text-on-surface-variant mt-2">
+                                            A comprehensive conservation journey combining off-grid
+                                            phumdi living, Sangai deer tracking with licensed
+                                            biologists, and zero-emission transit across Bishnupur
+                                            district.
+                                        </p>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md mt-space-lg">
+                                            {[
+                                                [
+                                                    "01",
+                                                    "STAY",
+                                                    "Thanga Phumdi Solar Cottage",
+                                                    "Off-grid solar, bio-toilet, open lake balcony, Chak-hao black rice porridge breakfast.",
+                                                    "Base Rate",
+                                                    "₹3,450 / night",
+                                                ],
+                                                [
+                                                    "02",
+                                                    "GUIDE",
+                                                    "Naobi Ningthoujam",
+                                                    "Govt Lic #MN-WLD-0482. Wildlife biologist, Meiteilon/English, high-zoom optics provided.",
+                                                    "Day Tariff",
+                                                    "₹2,200 / day",
+                                                ],
+                                                [
+                                                    "03",
+                                                    "GREEN CAB",
+                                                    "Tata Nexon EV Max",
+                                                    "Fleet #MN-01-EV-4412. Airport pickup, 24/7 SOS GPS, verified community driver.",
+                                                    "Circuit Cap",
+                                                    "₹2,400 flat",
+                                                ],
+                                            ].map(([num, label, title, desc, rateLabel, rate]) => (
+                                                <div
+                                                    key={num}
+                                                    className="p-4 rounded-xl bg-surface-container-low flex flex-col justify-between"
+                                                >
+                                                    <div>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-bold text-label-sm">
+                                                                {num}
+                                                            </span>
+                                                            <span className="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-bold">
+                                                                {label}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold line-clamp-1">
+                                                            {title}
+                                                        </h3>
+                                                        <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
+                                                            {desc}
+                                                        </p>
+                                                    </div>
+                                                    <div className="mt-4 pt-3 border-t-0 flex items-baseline justify-between">
+                                                        <span className="font-body-sm text-body-sm text-outline">
+                                                            {rateLabel}
+                                                        </span>
+                                                        <span className="font-label-md text-label-md text-on-surface font-bold">
+                                                            {rate}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 p-4 rounded-xl bg-surface-container flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined text-[24px]">
+                                                forest
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-label-md text-label-md text-on-surface font-bold">
+                                                Estimated Carbon Reduction: 46.8 kg CO₂e
+                                            </span>
+                                            <span className="font-body-sm text-body-sm text-on-surface-variant">
+                                                Compared to conventional fossil fuel taxis & city hotels.
+                                                Certified by Manipur State Remote Sensing Centre.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full lg:w-1/3 bg-primary p-space-lg md:p-space-xl text-on-primary flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-label-md text-label-md uppercase tracking-wider text-on-primary-container">
+                                                Bundle Summary
+                                            </span>
+                                            <span className="px-2.5 py-1 rounded bg-secondary text-on-secondary font-label-sm text-label-sm font-bold tracking-wide">
+                                                SAVE 15%
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-6 flex flex-col gap-3 font-body-sm text-body-sm text-on-primary/80">
+                                            {[
+                                                ["Homestay Stay (2 Nights)", "₹6,900"],
+                                                ["Certified Naturalist (2 Days)", "₹4,400"],
+                                                ["EV Airport & Sanctuary Transfer", "₹2,400"],
+                                            ].map(([label, value]) => (
+                                                <div key={label} className="flex justify-between items-center">
+                                                    <span>{label}</span>
+                                                    <span className="font-semibold text-on-primary">
+                                                        {value}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            <div className="my-2 h-[1px] bg-on-primary/10" />
+                                            <div className="flex justify-between items-center text-on-primary/60">
+                                                <span>Standard Package Price</span>
+                                                <span className="line-through">₹13,700</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-tertiary-fixed font-semibold">
+                                                <span>Tri-Bundle Eco-Subsidy (-15%)</span>
+                                                <span>-₹2,055</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-on-primary-container">
+                                                <span className="flex items-center gap-1">
+                                                    <span className="material-symbols-outlined text-[14px]">
+                                                        compost
+                                                    </span>
+                                                    Bamboo Offset (3 Culms)
+                                                </span>
+                                                <span>Included Free</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 p-4 rounded-xl bg-primary-container/80">
+                                            <span className="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">
+                                                Final Directorate Total
+                                            </span>
+                                            <div className="flex items-baseline gap-2 mt-1">
+                                                <span className="font-headline-lg text-headline-lg text-on-primary font-bold">
+                                                    ₹11,645
+                                                </span>
+                                                <span className="font-body-sm text-body-sm text-on-primary/70">
+                                                    all taxes & ILP fees incl.
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 flex flex-col gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => action("Complete 3-in-1 eco-circuit selected")}
+                                            className="w-full py-4 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-lg transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <span className="material-symbols-outlined text-[20px]">
+                                                shopping_bag
+                                            </span>
+                                            <span>Book Complete 3-in-1 Eco-Circuit</span>
+                                        </button>
+                                        <p className="font-body-sm text-body-sm text-center text-on-primary/60">
+                                            Secure payments via UPI, RuPay, Visa, DigiLocker e-ILP
+                                            verification in 60s.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Homestays */}
+                    <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <SectionHeading
+                                icon="roofing"
+                                eyebrow="Community Dwellings"
+                                title="Verified Indigenous Eco-Homestays"
+                                description="Stay in low-impact heritage structures owned by local indigenous families. Zero corporate intermediaries."
+                            >
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {filters.map((filter) => (
+                                        <button
+                                            key={filter}
+                                            type="button"
+                                            onClick={() => setActiveFilter(filter)}
+                                            className={`px-4 py-2 rounded-full font-label-sm text-label-sm font-semibold transition-colors ${activeFilter === filter
+                                                ? "bg-primary text-on-primary shadow-sm"
+                                                : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+                                                }`}
+                                        >
+                                            {filter}
+                                        </button>
+                                    ))}
+                                </div>
+                            </SectionHeading>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+                                {filteredHomestays.map((stay) => (
+                                    <HomestayCard key={stay.title} stay={stay} onAction={action} />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Guides */}
+                    <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <SectionHeading
+                                icon="badge"
+                                eyebrow="Field Naturalists & Curators"
+                                title="Licensed Naturalists, Storytellers & High-Altitude Guides"
+                                description="Certified by Directorate of Tourism & Wildlife Institute of India. Trained in Leave-No-Trace & CPR wilderness rescue."
+                            >
                                 <button
-                                    key={key}
                                     type="button"
-                                    onClick={() => setActiveService(key)}
-                                    className={`px-5 py-2.5 rounded-full font-label-md text-label-md shadow-md flex items-center gap-2 transition-all ${activeService === key
-                                        ? "bg-primary-container text-on-primary"
-                                        : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-                                        }`}
+                                    onClick={() => action("Showing all 142 licensed guides")}
+                                    className="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-bold hover:underline"
                                 >
+                                    <span>View all 142 licensed guides</span>
                                     <span className="material-symbols-outlined text-[18px]">
-                                        {icon}
+                                        arrow_forward
                                     </span>
-                                    <span>{label}</span>
                                 </button>
-                            ))}
-                        </div>
+                            </SectionHeading>
 
-                        <div className="p-space-lg rounded-2xl bg-surface-container-lowest shadow-md">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-md">
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[16px] text-primary">
-                                            location_on
-                                        </span>
-                                        Destination / Circuit
-                                    </label>
-                                    <select
-                                        value={destination}
-                                        onChange={(e) => setDestination(e.target.value)}
-                                        className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    >
-                                        <option>Loktak Lake & Keibul Lamjao (Bishnupur)</option>
-                                        <option>Shirui Hills & Longpi Village (Ukhrul)</option>
-                                        <option>Imphal Royal Citadel & Andro Village</option>
-                                        <option>Dzükou Valley & Senapati Heights</option>
-                                        <option>Khuga Dam & Behiang Valley (Churachandpur)</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[16px] text-primary">
-                                            calendar_today
-                                        </span>
-                                        Check-in & Departure
-                                    </label>
-                                    <input
-                                        value={dateRange}
-                                        onChange={(e) => setDateRange(e.target.value)}
-                                        className="w-full h-12 pl-3 pr-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                        type="text"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[16px] text-primary">
-                                            group
-                                        </span>
-                                        Travelers & Stays
-                                    </label>
-                                    <select
-                                        value={travelers}
-                                        onChange={(e) => setTravelers(e.target.value)}
-                                        className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    >
-                                        <option>2 Adults, 1 Eco-Room</option>
-                                        <option>1 Adult, 1 Solo Pod</option>
-                                        <option>4 Adults, 2 Cottages (Family)</option>
-                                        <option>6+ Eco-Expedition Crew</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[16px] text-primary">
-                                            person_search
-                                        </span>
-                                        Field Naturalist
-                                    </label>
-                                    <select
-                                        value={guide}
-                                        onChange={(e) => setGuide(e.target.value)}
-                                        className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    >
-                                        <option>Indigenous Wildlife & Birding</option>
-                                        <option>High-Altitude Ridge Trekker</option>
-                                        <option>Kangla Historical & Epigraphy Scholar</option>
-                                        <option>Tangkhul Ethnobotanist & Forager</option>
-                                        <option>No Guide Required</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[16px] text-primary">
-                                            electric_car
-                                        </span>
-                                        EV Cab Allocation
-                                    </label>
-                                    <select
-                                        value={cab}
-                                        onChange={(e) => setCab(e.target.value)}
-                                        className="w-full h-12 pl-3 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    >
-                                        <option>Airport Pick-up + 3 Days Circuit EV</option>
-                                        <option>Inter-District Transit Only</option>
-                                        <option>Point-to-Point Shuttle Only</option>
-                                        <option>Self-Drive EV Station Pass</option>
-                                        <option>No Transport Required</option>
-                                    </select>
-                                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+                                {guides.map((item) => (
+                                    <GuideCard key={item.name} guide={item} onAction={action} />
+                                ))}
                             </div>
+                        </div>
+                    </section>
 
-                            <div className="mt-space-md pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-                                    <span className="material-symbols-outlined text-primary text-[18px]">
-                                        check_circle
-                                    </span>
-                                    <span>
-                                        Includes mandatory ILP verification pre-clearance at Imphal
-                                        Airport
-                                    </span>
+                    {/* Electric Cabs */}
+                    <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <SectionHeading
+                                icon="ev_station"
+                                eyebrow="Zero-Emission Transport Grid"
+                                title="Directorate-Sanctioned Electric Tourist Cabs"
+                                description="State-regulated non-surge electric vehicles monitored via real-time satellite telemetry with direct Tourist Police SOS integration."
+                            >
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-lowest shadow-sm text-on-surface font-label-sm text-label-sm font-semibold">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping" />
+                                    <span>95 Cabs Active • Fixed Government Mileage Tariffs • Zero Surge</span>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={runSearch}
-                                    className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                                >
-                                    <span className="material-symbols-outlined text-[20px]">
-                                        search_insights
-                                    </span>
-                                    <span>Search Live Availability & Calculate Bundle Price</span>
-                                </button>
+                            </SectionHeading>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+                                {cabs.map((cabItem) => (
+                                    <CabCard key={cabItem.number} cab={cabItem} onAction={action} />
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Financial Transparency */}
+                    <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
+                        <div className="max-w-[1320px] mx-auto">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
+                                <div className="p-space-xl rounded-3xl bg-surface-container-lowest shadow-md">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-primary">
+                                            account_balance
+                                        </span>
+                                        <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
+                                            Public Financial Transparency
+                                        </span>
+                                    </div>
+                                    <h2 className="font-headline-lg text-headline-lg text-primary font-bold mt-1">
+                                        Transparent Community Revenue Ledger
+                                    </h2>
+                                    <p className="font-body-md text-body-md text-on-surface-variant mt-2">
+                                        Every rupee processed on this portal is audited directly by
+                                        the State Comptroller. We eliminate commissions to ensure
+                                        funds directly regenerate local rural livelihoods.
+                                    </p>
+
+                                    <div className="mt-6">
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-label-md text-label-md text-on-surface font-bold">
+                                                Fund Allocation Distribution (Per ₹1,000 Spent)
+                                            </span>
+                                            <span className="font-label-sm text-label-sm text-primary font-bold">
+                                                100% Traceable
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-5 flex flex-col gap-4">
+                                            {[
+                                                [
+                                                    "82%",
+                                                    "Direct Host & Guide Payout",
+                                                    "Deposited in verified Jan Dhan/Direct DBT accounts within 4 hours.",
+                                                ],
+                                                [
+                                                    "10%",
+                                                    "Village Conservation Fund",
+                                                    "Supports Loktak Phumdi cleaning & Shirui Kashong ridge restoration.",
+                                                ],
+                                                [
+                                                    "5%",
+                                                    "Solar & EV Grid Upkeep",
+                                                    "District battery charging stations & off-grid solar homestay micro-grids.",
+                                                ],
+                                                [
+                                                    "3%",
+                                                    "Tourist Police Escort System",
+                                                    "24/7 dedicated distress helpline & mountain medical kits maintenance.",
+                                                ],
+                                            ].map(([percent, title, desc]) => (
+                                                <div key={percent} className="grid grid-cols-[64px_1fr] gap-3 items-start">
+                                                    <span className="font-headline-sm text-headline-sm text-primary font-bold">
+                                                        {percent}
+                                                    </span>
+                                                    <div>
+                                                        <span className="font-label-md text-label-md text-on-surface font-bold">
+                                                            {title}
+                                                        </span>
+                                                        <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                                                            {desc}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-space-xl rounded-3xl bg-primary text-on-primary shadow-md flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="material-symbols-outlined">
+                                                verified_user
+                                            </span>
+                                            <span className="font-label-sm text-label-sm text-on-primary-container uppercase font-bold tracking-wider">
+                                                Traveler Safety & Legal Guarantee
+                                            </span>
+                                        </div>
+                                        <h2 className="font-headline-lg text-headline-lg font-bold mt-1">
+                                            Government of Manipur Protected Booking
+                                        </h2>
+
+                                        <div className="mt-6 flex flex-col gap-5">
+                                            {[
+                                                [
+                                                    "Instant DigiLocker e-ILP",
+                                                    "Inner Line Permit pre-approval automatically linked to all booked accommodations and cabs.",
+                                                ],
+                                                [
+                                                    "Free 48-Hour Cancellation",
+                                                    "100% refund on homestay reservations up to 48 hours prior to check-in.",
+                                                ],
+                                                [
+                                                    "Government Verified Receipts",
+                                                    "GST invoices issued on Directorate letterhead with verifiable QR verification.",
+                                                ],
+                                            ].map(([title, desc]) => (
+                                                <div key={title} className="flex items-start gap-3">
+                                                    <span className="material-symbols-outlined text-primary-fixed text-[20px] mt-0.5">
+                                                        check_circle
+                                                    </span>
+                                                    <div>
+                                                        <span className="font-label-md text-label-md font-bold">
+                                                            {title}
+                                                        </span>
+                                                        <p className="font-body-sm text-body-sm text-on-primary/75 mt-1">
+                                                            {desc}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 p-4 rounded-xl bg-primary-container/80 flex items-center gap-3">
+                                        <span className="material-symbols-outlined text-[28px]">
+                                            support_agent
+                                        </span>
+                                        <div>
+                                            <span className="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">
+                                                24/7 Tourist Police Helpdesk
+                                            </span>
+                                            <div className="font-headline-sm text-headline-sm font-bold">
+                                                1800-345-3885 / 0385
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             {feedback && (
-                                <div className="mt-4 p-3 rounded-lg bg-surface-container text-primary font-label-md text-label-md flex items-center justify-between gap-4">
+                                <div className="mt-6 p-4 rounded-xl bg-primary/10 text-primary font-label-md text-label-md flex items-center justify-between">
                                     <span>{feedback}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => setFeedback("")}
-                                        className="text-outline hover:text-primary"
-                                        aria-label="Dismiss"
-                                    >
-                                        ×
+                                    <button type="button" onClick={() => setFeedback("")}>
+                                        <span className="material-symbols-outlined">close</span>
                                     </button>
                                 </div>
                             )}
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
+            </main>
 
-                {/* Tri-Bundle Spotlight */}
-                <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <div className="flex flex-col lg:flex-row items-stretch rounded-3xl bg-surface-container-lowest shadow-xl overflow-hidden">
-                            <div className="w-full lg:w-2/3 p-space-lg md:p-space-xl flex flex-col justify-between">
-                                <div>
-                                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                                        <span className="px-3 py-1 rounded-full bg-secondary-container/30 text-secondary font-label-sm text-label-sm font-bold uppercase tracking-wider">
-                                            Directorate Curated Triple-Bundle
-                                        </span>
-                                        <span className="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">
-                                            Instant e-ILP Linked
-                                        </span>
-                                    </div>
-                                    <h2 className="font-headline-lg text-headline-lg text-primary font-bold">
-                                        Loktak Floating Haven & Brow-Antlered Deer Trail (3D/2N)
-                                    </h2>
-                                    <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-                                        A comprehensive conservation journey combining off-grid
-                                        phumdi living, Sangai deer tracking with licensed
-                                        biologists, and zero-emission transit across Bishnupur
-                                        district.
-                                    </p>
+        </>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md mt-space-lg">
-                                        {[
-                                            [
-                                                "01",
-                                                "STAY",
-                                                "Thanga Phumdi Solar Cottage",
-                                                "Off-grid solar, bio-toilet, open lake balcony, Chak-hao black rice porridge breakfast.",
-                                                "Base Rate",
-                                                "₹3,450 / night",
-                                            ],
-                                            [
-                                                "02",
-                                                "GUIDE",
-                                                "Naobi Ningthoujam",
-                                                "Govt Lic #MN-WLD-0482. Wildlife biologist, Meiteilon/English, high-zoom optics provided.",
-                                                "Day Tariff",
-                                                "₹2,200 / day",
-                                            ],
-                                            [
-                                                "03",
-                                                "GREEN CAB",
-                                                "Tata Nexon EV Max",
-                                                "Fleet #MN-01-EV-4412. Airport pickup, 24/7 SOS GPS, verified community driver.",
-                                                "Circuit Cap",
-                                                "₹2,400 flat",
-                                            ],
-                                        ].map(([num, label, title, desc, rateLabel, rate]) => (
-                                            <div
-                                                key={num}
-                                                className="p-4 rounded-xl bg-surface-container-low flex flex-col justify-between"
-                                            >
-                                                <div>
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-bold text-label-sm">
-                                                            {num}
-                                                        </span>
-                                                        <span className="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm font-bold">
-                                                            {label}
-                                                        </span>
-                                                    </div>
-                                                    <h3 className="font-headline-sm text-headline-sm text-on-surface font-semibold line-clamp-1">
-                                                        {title}
-                                                    </h3>
-                                                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5">
-                                                        {desc}
-                                                    </p>
-                                                </div>
-                                                <div className="mt-4 pt-3 border-t-0 flex items-baseline justify-between">
-                                                    <span className="font-body-sm text-body-sm text-outline">
-                                                        {rateLabel}
-                                                    </span>
-                                                    <span className="font-label-md text-label-md text-on-surface font-bold">
-                                                        {rate}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 p-4 rounded-xl bg-surface-container flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0">
-                                        <span className="material-symbols-outlined text-[24px]">
-                                            forest
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-label-md text-label-md text-on-surface font-bold">
-                                            Estimated Carbon Reduction: 46.8 kg CO₂e
-                                        </span>
-                                        <span className="font-body-sm text-body-sm text-on-surface-variant">
-                                            Compared to conventional fossil fuel taxis & city hotels.
-                                            Certified by Manipur State Remote Sensing Centre.
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="w-full lg:w-1/3 bg-primary p-space-lg md:p-space-xl text-on-primary flex flex-col justify-between">
-                                <div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-label-md text-label-md uppercase tracking-wider text-on-primary-container">
-                                            Bundle Summary
-                                        </span>
-                                        <span className="px-2.5 py-1 rounded bg-secondary text-on-secondary font-label-sm text-label-sm font-bold tracking-wide">
-                                            SAVE 15%
-                                        </span>
-                                    </div>
-
-                                    <div className="mt-6 flex flex-col gap-3 font-body-sm text-body-sm text-on-primary/80">
-                                        {[
-                                            ["Homestay Stay (2 Nights)", "₹6,900"],
-                                            ["Certified Naturalist (2 Days)", "₹4,400"],
-                                            ["EV Airport & Sanctuary Transfer", "₹2,400"],
-                                        ].map(([label, value]) => (
-                                            <div key={label} className="flex justify-between items-center">
-                                                <span>{label}</span>
-                                                <span className="font-semibold text-on-primary">
-                                                    {value}
-                                                </span>
-                                            </div>
-                                        ))}
-                                        <div className="my-2 h-[1px] bg-on-primary/10" />
-                                        <div className="flex justify-between items-center text-on-primary/60">
-                                            <span>Standard Package Price</span>
-                                            <span className="line-through">₹13,700</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-tertiary-fixed font-semibold">
-                                            <span>Tri-Bundle Eco-Subsidy (-15%)</span>
-                                            <span>-₹2,055</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-on-primary-container">
-                                            <span className="flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-[14px]">
-                                                    compost
-                                                </span>
-                                                Bamboo Offset (3 Culms)
-                                            </span>
-                                            <span>Included Free</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-8 p-4 rounded-xl bg-primary-container/80">
-                                        <span className="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">
-                                            Final Directorate Total
-                                        </span>
-                                        <div className="flex items-baseline gap-2 mt-1">
-                                            <span className="font-headline-lg text-headline-lg text-on-primary font-bold">
-                                                ₹11,645
-                                            </span>
-                                            <span className="font-body-sm text-body-sm text-on-primary/70">
-                                                all taxes & ILP fees incl.
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 flex flex-col gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => action("Complete 3-in-1 eco-circuit selected")}
-                                        className="w-full py-4 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-lg transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <span className="material-symbols-outlined text-[20px]">
-                                            shopping_bag
-                                        </span>
-                                        <span>Book Complete 3-in-1 Eco-Circuit</span>
-                                    </button>
-                                    <p className="font-body-sm text-body-sm text-center text-on-primary/60">
-                                        Secure payments via UPI, RuPay, Visa, DigiLocker e-ILP
-                                        verification in 60s.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Homestays */}
-                <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <SectionHeading
-                            icon="roofing"
-                            eyebrow="Community Dwellings"
-                            title="Verified Indigenous Eco-Homestays"
-                            description="Stay in low-impact heritage structures owned by local indigenous families. Zero corporate intermediaries."
-                        >
-                            <div className="flex flex-wrap items-center gap-2">
-                                {filters.map((filter) => (
-                                    <button
-                                        key={filter}
-                                        type="button"
-                                        onClick={() => setActiveFilter(filter)}
-                                        className={`px-4 py-2 rounded-full font-label-sm text-label-sm font-semibold transition-colors ${activeFilter === filter
-                                            ? "bg-primary text-on-primary shadow-sm"
-                                            : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-                                            }`}
-                                    >
-                                        {filter}
-                                    </button>
-                                ))}
-                            </div>
-                        </SectionHeading>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-                            {filteredHomestays.map((stay) => (
-                                <HomestayCard key={stay.title} stay={stay} onAction={action} />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Guides */}
-                <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <SectionHeading
-                            icon="badge"
-                            eyebrow="Field Naturalists & Curators"
-                            title="Licensed Naturalists, Storytellers & High-Altitude Guides"
-                            description="Certified by Directorate of Tourism & Wildlife Institute of India. Trained in Leave-No-Trace & CPR wilderness rescue."
-                        >
-                            <button
-                                type="button"
-                                onClick={() => action("Showing all 142 licensed guides")}
-                                className="inline-flex items-center gap-1 font-label-md text-label-md text-primary font-bold hover:underline"
-                            >
-                                <span>View all 142 licensed guides</span>
-                                <span className="material-symbols-outlined text-[18px]">
-                                    arrow_forward
-                                </span>
-                            </button>
-                        </SectionHeading>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-                            {guides.map((item) => (
-                                <GuideCard key={item.name} guide={item} onAction={action} />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Electric Cabs */}
-                <section className="w-full bg-surface-container-low py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <SectionHeading
-                            icon="ev_station"
-                            eyebrow="Zero-Emission Transport Grid"
-                            title="Directorate-Sanctioned Electric Tourist Cabs"
-                            description="State-regulated non-surge electric vehicles monitored via real-time satellite telemetry with direct Tourist Police SOS integration."
-                        >
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-lowest shadow-sm text-on-surface font-label-sm text-label-sm font-semibold">
-                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-ping" />
-                                <span>95 Cabs Active • Fixed Government Mileage Tariffs • Zero Surge</span>
-                            </div>
-                        </SectionHeading>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
-                            {cabs.map((cabItem) => (
-                                <CabCard key={cabItem.number} cab={cabItem} onAction={action} />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Financial Transparency */}
-                <section className="w-full bg-surface py-space-xl px-margin-mobile md:px-margin">
-                    <div className="max-w-[1320px] mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
-                            <div className="p-space-xl rounded-3xl bg-surface-container-lowest shadow-md">
-                                <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-primary">
-                                        account_balance
-                                    </span>
-                                    <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
-                                        Public Financial Transparency
-                                    </span>
-                                </div>
-                                <h2 className="font-headline-lg text-headline-lg text-primary font-bold mt-1">
-                                    Transparent Community Revenue Ledger
-                                </h2>
-                                <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-                                    Every rupee processed on this portal is audited directly by
-                                    the State Comptroller. We eliminate commissions to ensure
-                                    funds directly regenerate local rural livelihoods.
-                                </p>
-
-                                <div className="mt-6">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-label-md text-label-md text-on-surface font-bold">
-                                            Fund Allocation Distribution (Per ₹1,000 Spent)
-                                        </span>
-                                        <span className="font-label-sm text-label-sm text-primary font-bold">
-                                            100% Traceable
-                                        </span>
-                                    </div>
-
-                                    <div className="mt-5 flex flex-col gap-4">
-                                        {[
-                                            [
-                                                "82%",
-                                                "Direct Host & Guide Payout",
-                                                "Deposited in verified Jan Dhan/Direct DBT accounts within 4 hours.",
-                                            ],
-                                            [
-                                                "10%",
-                                                "Village Conservation Fund",
-                                                "Supports Loktak Phumdi cleaning & Shirui Kashong ridge restoration.",
-                                            ],
-                                            [
-                                                "5%",
-                                                "Solar & EV Grid Upkeep",
-                                                "District battery charging stations & off-grid solar homestay micro-grids.",
-                                            ],
-                                            [
-                                                "3%",
-                                                "Tourist Police Escort System",
-                                                "24/7 dedicated distress helpline & mountain medical kits maintenance.",
-                                            ],
-                                        ].map(([percent, title, desc]) => (
-                                            <div key={percent} className="grid grid-cols-[64px_1fr] gap-3 items-start">
-                                                <span className="font-headline-sm text-headline-sm text-primary font-bold">
-                                                    {percent}
-                                                </span>
-                                                <div>
-                                                    <span className="font-label-md text-label-md text-on-surface font-bold">
-                                                        {title}
-                                                    </span>
-                                                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                                                        {desc}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="p-space-xl rounded-3xl bg-primary text-on-primary shadow-md flex flex-col justify-between">
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined">
-                                            verified_user
-                                        </span>
-                                        <span className="font-label-sm text-label-sm text-on-primary-container uppercase font-bold tracking-wider">
-                                            Traveler Safety & Legal Guarantee
-                                        </span>
-                                    </div>
-                                    <h2 className="font-headline-lg text-headline-lg font-bold mt-1">
-                                        Government of Manipur Protected Booking
-                                    </h2>
-
-                                    <div className="mt-6 flex flex-col gap-5">
-                                        {[
-                                            [
-                                                "Instant DigiLocker e-ILP",
-                                                "Inner Line Permit pre-approval automatically linked to all booked accommodations and cabs.",
-                                            ],
-                                            [
-                                                "Free 48-Hour Cancellation",
-                                                "100% refund on homestay reservations up to 48 hours prior to check-in.",
-                                            ],
-                                            [
-                                                "Government Verified Receipts",
-                                                "GST invoices issued on Directorate letterhead with verifiable QR verification.",
-                                            ],
-                                        ].map(([title, desc]) => (
-                                            <div key={title} className="flex items-start gap-3">
-                                                <span className="material-symbols-outlined text-primary-fixed text-[20px] mt-0.5">
-                                                    check_circle
-                                                </span>
-                                                <div>
-                                                    <span className="font-label-md text-label-md font-bold">
-                                                        {title}
-                                                    </span>
-                                                    <p className="font-body-sm text-body-sm text-on-primary/75 mt-1">
-                                                        {desc}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 p-4 rounded-xl bg-primary-container/80 flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-[28px]">
-                                        support_agent
-                                    </span>
-                                    <div>
-                                        <span className="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">
-                                            24/7 Tourist Police Helpdesk
-                                        </span>
-                                        <div className="font-headline-sm text-headline-sm font-bold">
-                                            1800-345-3885 / 0385
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {feedback && (
-                            <div className="mt-6 p-4 rounded-xl bg-primary/10 text-primary font-label-md text-label-md flex items-center justify-between">
-                                <span>{feedback}</span>
-                                <button type="button" onClick={() => setFeedback("")}>
-                                    <span className="material-symbols-outlined">close</span>
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </section>
-            </div>
-        </main>
     );
 }

@@ -1,37 +1,6 @@
 import React, { useState } from 'react';
 import './Transportation.css';
-const Telemetry = () => (
-    <section className="telemetry-bar">
-        <div className="telemetry-container">
-            <div className="telemetry-scroller">
-                <div className="telemetry-item">
-                    <span className="live-indicator">
-                        <span className="ping-dot"></span>
-                        <span className="static-dot"></span>
-                    </span>
-                    <span className="telemetry-label">ACTIVE TOURIST FLEETS:</span>
-                    <span className="telemetry-value">148 Cabs (100% EV / Green Certified)</span>
-                </div>
-                <div className="divider-vertical"></div>
-                <div className="telemetry-item">
-                    <span className="material-symbols-outlined text-tertiary-fixed icon-small">verified_user</span>
-                    <span className="telemetry-value">Zero Surge Tariff Enforced by Govt of Manipur</span>
-                </div>
-                <div className="divider-vertical"></div>
-                <div className="telemetry-item">
-                    <span className="material-symbols-outlined text-secondary-fixed icon-small">satellite_alt</span>
-                    <span className="telemetry-value">24/7 Tourist Police SOS Telemetry Synced</span>
-                </div>
-                <div className="divider-vertical"></div>
-                <div className="telemetry-item">
-                    <span className="material-symbols-outlined text-primary-fixed icon-small">local_airport</span>
-                    <span className="telemetry-value">IMF Terminal 1 Pre-Paid Taxi Kiosk: Active</span>
-                </div>
-            </div>
-            <div className="api-badge">Official Dispatch API v3.2</div>
-        </div>
-    </section>
-);
+import Telemetry from '../components/home/TelemetryBar'
 
 const HeroBooking = () => {
     const [activeTab, setActiveTab] = useState('instant');

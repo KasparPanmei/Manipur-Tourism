@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { Link } from "react-router-dom";
 const WEATHER_URL =
   "https://api.open-meteo.com/v1/forecast" +
   "?latitude=24.8170" +
@@ -211,7 +211,9 @@ export default function TelemetryBar() {
           </span>
 
           <span>
-            Inner Line Permit (e-ILP): Instant E-Approval Active
+            <Link to="/EILP" className="telemetry-status-link">
+              Inner Line Permit (e-ILP): Instant E-Approval Active
+            </Link>
           </span>
         </div>
       </div>

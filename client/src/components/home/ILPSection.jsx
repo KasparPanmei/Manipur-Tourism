@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function ILPSection() {
   return (
     <section
@@ -123,12 +125,12 @@ export default function ILPSection() {
                 Foreign nationals exempt (Register via FRO Form-C instead).
               </p>
 
-              <a
-                href="#"
+              <Link
+                to="/EILP"
                 className="ilp-button"
               >
                 Apply for e-ILP Now
-              </a>
+              </Link>
 
             </div>
 

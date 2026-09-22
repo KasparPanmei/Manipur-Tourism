@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import Telemetry from '../components/home/TelemetryBar';
 const stories = {
     phanek: {
         title: "Phanek Mayek Naibi Heritage",
@@ -80,14 +80,76 @@ const CultureHeritageItems = () => {
     };
 
     const addToCart = (title, price) => {
-        setToast({
-            show: true,
-            title: `${title} Added`,
-            sub: `₹${price.toLocaleString()} allocated directly to weaver`
-        });
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 3200);
+        const authToken = localStorage.getItem("authToken");
+        const authUser = localStorage.getItem("authUser");
+
+        // User is NOT logged in
+        if (!authToken || !authUser) {
+            // Save the item temporarily so it can be added
+            // automatically after successful login.
+            localStorage.setItem(
+                "pendingCartItem",
+                JSON.stringify({
+                    title,
+                    price
+                })
+            );
+
+            // Tell Navbar to open the login/account modal
+            window.dispatchEvent(
+                new CustomEvent("open-account-modal", {
+                    detail: {
+                        view: "choose"
+                    }
+                })
+            );
+
+            return;
+        }
+
+        // User IS logged in
+        addAuthenticatedItemToCart(title, price);
+    };
+    const addAuthenticatedItemToCart = async (title, price) => {
+        try {
+            const authToken = localStorage.getItem("authToken");
+
+            if (!authToken) {
+                return;
+            }
+
+            // We will connect this to your actual cart API here.
+            // Do not show "Added" until the backend confirms success.
+
+            setToast({
+                show: true,
+                title: `${title} Added`,
+                sub: `₹${price.toLocaleString()} allocated directly to weaver`
+            });
+
+            setTimeout(() => {
+                setToast(prev => ({
+                    ...prev,
+                    show: false
+                }));
+            }, 3200);
+
+        } catch (error) {
+            console.error("Add to cart error:", error);
+
+            setToast({
+                show: true,
+                title: "Unable to Add",
+                sub: "Please try again."
+            });
+
+            setTimeout(() => {
+                setToast(prev => ({
+                    ...prev,
+                    show: false
+                }));
+            }, 3200);
+        }
     };
 
     const quickViewStory = (key) => setModal({ show: true, key });
@@ -95,32 +157,7 @@ const CultureHeritageItems = () => {
 
     return (
         <div className="bg-surface font-body-md text-on-surface antialiased w-full">
-            <div className="bg-primary text-on-primary py-space-xs px-margin w-full">
-                <div className="max-w-[1360px] mx-auto flex items-center justify-between text-label-sm font-label-sm">
-                    <div className="flex items-center gap-space-lg overflow-hidden whitespace-nowrap">
-                        <span className="flex items-center gap-space-xs">
-                            <span className="material-symbols-outlined text-[14px] text-tertiary-fixed-dim">verified</span>HANDLOOM MARK & SILK MARK CERTIFIED
-                        </span>
-                        <span className="opacity-40">•</span>
-                        <span className="flex items-center gap-space-xs">
-                            <span className="material-symbols-outlined text-[14px] text-primary-fixed">payments</span>100% DIRECT WEAVER REMITTANCE
-                        </span>
-                        <span className="opacity-40">•</span>
-                        <span className="flex items-center gap-space-xs">
-                            <span className="material-symbols-outlined text-[14px] text-secondary-fixed">workspace_premium</span>GI-TAGGED MANIPURI CRAFTS
-                        </span>
-                        <span className="opacity-40">•</span>
-                        <span className="flex items-center gap-space-xs">
-                            <span className="material-symbols-outlined text-[14px] text-primary-fixed">local_shipping</span>WORLDWIDE INSURED SHIPPING
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-space-md">
-                        <span className="flex items-center gap-1.5 text-surface-container-low">
-                            <span className="inline-block w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>Helpline: 1800-345-3885
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <Telemetry />
 
             <div className="w-full pt-4 bg-surface min-h-[calc(100vh-28rem)]">
                 <div className="flex flex-col w-full">

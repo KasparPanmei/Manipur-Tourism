@@ -118,7 +118,7 @@ export default function Footer() {
         </div>
         <div className="pt-space-md flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="font-body-sm text-body-sm text-outline">
-            © 2025 Directorate of Tourism, Government of Manipur. All Rights Reserved.
+            © 2026 VistaVentures. All Rights Reserved.
           </p>
           <div className="flex items-center gap-space-md font-body-sm text-body-sm text-outline">
             <a className="hover:text-primary transition-colors" href="#">

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function HeroSection() {
   return (
     <section className="hero-section">
@@ -62,7 +64,9 @@ export default function HeroSection() {
                 badge
               </span>
 
-              Apply Instant e-ILP (2 Min)
+              <Link to="/EILP" className="hero-secondary-link">
+                Apply Instant e-ILP (2 Min)
+              </Link>
             </button>
 
           </div>
