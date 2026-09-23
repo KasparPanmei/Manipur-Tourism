@@ -1,8 +1,10 @@
+import mongoose from "mongoose";
 import crypto from "crypto";
 
 import Cart from "../models/Cart.js";
 import User from "../models/Users.js";
 import Order from "../models/Order.js";
+import Address from "../models/Address.js";
 
 import razorpay from "../utils/razorpay.js";
 
@@ -24,6 +26,31 @@ export const createCartPaymentOrder = async (req, res) => {
         if (!cart || !cart.items?.length) {
             return res.status(400).json({
                 message: "Your cart is empty.",
+            });
+        }
+
+        const { addressId } = req.body || {};
+
+        if (
+            !addressId ||
+            !mongoose.Types.ObjectId.isValid(addressId)
+        ) {
+            return res.status(400).json({
+                message:
+                    "A valid delivery address is required before booking.",
+            });
+        }
+
+        const deliveryAddress =
+            await Address.findOne({
+                _id: addressId,
+                user: req.user.id,
+            }).lean();
+
+        if (!deliveryAddress) {
+            return res.status(400).json({
+                message:
+                    "Selected delivery address was not found.",
             });
         }
 
@@ -74,6 +101,19 @@ export const createCartPaymentOrder = async (req, res) => {
             })),
 
             amount: totalAmount,
+
+            deliveryAddress: {
+                addressId: deliveryAddress._id,
+                fullName: deliveryAddress.fullName,
+                phone: deliveryAddress.phone,
+                addressLine1: deliveryAddress.addressLine1,
+                addressLine2: deliveryAddress.addressLine2 || "",
+                city: deliveryAddress.city,
+                district: deliveryAddress.district,
+                state: deliveryAddress.state,
+                pincode: deliveryAddress.pincode,
+                landmark: deliveryAddress.landmark || "",
+            },
 
             currency: "INR",
 

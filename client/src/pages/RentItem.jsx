@@ -29,15 +29,6 @@ export default function RentItem() {
                 <div className="flex flex-col w-full">
                     {/* SECTION 1: BREADCRUMBS & EDITORIAL HERO HEADER */}
                     <section className="w-full px-gutter max-w-7xl mx-auto pt-space-md pb-space-lg">
-                        <div className="flex flex-wrap items-center gap-space-xs font-label-md text-label-md text-on-surface-variant mb-space-md">
-                            <a className="hover:text-primary transition-colors flex items-center gap-1" href="#">
-                                <span className="material-symbols-outlined text-sm">home</span>Home
-                            </a>
-                            <span className="text-outline-variant">/</span>
-                            <a className="hover:text-primary transition-colors" href="#">Travel & Adventure Gear</a>
-                            <span className="text-outline-variant">/</span>
-                            <span className="text-primary font-semibold">Official Equipment Rental Depot</span>
-                        </div>
                         <div className="bg-surface-container-low rounded-xl p-space-lg md:p-space-xl relative overflow-hidden shadow-sm">
                             <div className="relative z-10 max-w-4xl flex flex-col gap-space-sm">
                                 <div className="inline-flex items-center gap-space-xs bg-surface-container-lowest px-space-md py-space-xs rounded-full w-fit shadow-sm">
@@ -96,73 +87,6 @@ export default function RentItem() {
                         </div>
                     </section>
 
-                    {/* SECTION 2: INTERACTIVE GEAR RESERVATION BAR */}
-                    <section className="w-full px-gutter max-w-7xl mx-auto -mt-4 z-20">
-                        <div className="bg-surface-container-lowest rounded-xl p-space-md md:p-space-lg shadow-xl shadow-primary/5">
-                            <div className="flex items-center justify-between gap-space-sm pb-space-sm mb-space-sm">
-                                <div className="flex items-center gap-space-xs">
-                                    <span className="material-symbols-outlined text-primary text-xl">tune</span>
-                                    <h2 className="font-title-lg text-title-lg text-primary">Select Reservation Details & Expedition Base</h2>
-                                </div>
-                                <span className="font-label-md text-label-md text-on-surface-variant bg-surface-container-low px-space-sm py-1 rounded">
-                                    Govt. Regulated Tariffs
-                                </span>
-                            </div>
-                            <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-md" id="gear-reservation-form">
-                                <div className="flex flex-col gap-1">
-                                    <label className="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-sm text-primary">storefront</span> Pickup Depot
-                                    </label>
-                                    <div className="relative">
-                                        <select className="w-full h-12 bg-surface-container-low rounded-lg text-on-surface px-space-sm font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest appearance-none cursor-pointer">
-                                            <option>Imphal Central Depot (Kangla Gate)</option>
-                                            <option>Senapati Basecamp (Dzükou Trailhead)</option>
-                                            <option>Ukhrul Town Hub (Shirui Kashong Base)</option>
-                                            <option>Sendra Island Depot (Loktak Lake)</option>
-                                            <option>Bir Tikendrajit Airport Counter (IMF Bay)</option>
-                                        </select>
-                                        <span className="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-on-surface-variant text-base">expand_more</span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-sm text-primary">explore</span> Expedition Type
-                                    </label>
-                                    <div className="relative">
-                                        <select className="w-full h-12 bg-surface-container-low rounded-lg text-on-surface px-space-sm font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest appearance-none cursor-pointer">
-                                            <option>All Expeditions</option>
-                                            <option>Alpine Trekking (Dzükou / Shirui)</option>
-                                            <option>Wetland & Kayak Camping (Loktak)</option>
-                                            <option>Caving & Spelunking (Tharon / Khoupum)</option>
-                                            <option>Highland Leisure Camping</option>
-                                        </select>
-                                        <span className="material-symbols-outlined absolute right-3 top-3 pointer-events-none text-on-surface-variant text-base">expand_more</span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-sm text-primary">calendar_today</span> Handover Date
-                                    </label>
-                                    <input className="w-full h-12 bg-surface-container-low rounded-lg text-on-surface px-space-sm font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest cursor-pointer" type="date" defaultValue="2025-04-10" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-sm text-primary">event_available</span> Return Date
-                                    </label>
-                                    <div className="relative">
-                                        <input className="w-full h-12 bg-surface-container-low rounded-lg text-on-surface px-space-sm font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest cursor-pointer" type="date" defaultValue="2025-04-13" />
-                                        <span className="absolute right-3 top-3.5 font-label-sm text-label-sm text-secondary pointer-events-none bg-surface-container-lowest px-1.5 py-0.5 rounded">3 Days</span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col justify-end">
-                                    <button className="w-full h-12 bg-primary text-on-primary rounded-lg font-title-sm text-title-sm flex items-center justify-center gap-space-xs hover:bg-primary-container transition-colors shadow-md" type="button">
-                                        <span className="material-symbols-outlined text-base">search_check</span>
-                                        <span>Check Availability</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </section>
 
                     {/* SECTION 3: CURATED ALL-IN-ONE EXPEDITION GEAR PACKAGES */}
                     <section className="w-full px-gutter max-w-7xl mx-auto pt-space-xl">

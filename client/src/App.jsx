@@ -13,11 +13,12 @@ import ExploreManipur from "./pages/ExploreManipur.jsx";
 import EcoHomestays from "./pages/EcoHomestays.jsx";
 import CultureHeritageItems from "./pages/CultureHeritageItems.jsx";
 import Transportation from "./pages/Transportation.jsx";
+import GuideService from "./pages/GuideService.jsx"
 import EILP from "./pages/EILP.jsx";
 import VerifyEILP from "./pages/VerifyEILP.jsx";
 import RentItem from "./pages/RentItem.jsx";
 import Admin from "./pages/Admin.jsx";
-
+import LoktakLakeGuide from "./pages/destination/Loktak.jsx";
 
 function AppLayout() {
   const location = useLocation();
@@ -63,6 +64,7 @@ function AppLayout() {
             path="/Transportation"
             element={<Transportation />}
           />
+          <Route path="/GuideService" element={<GuideService />} />
 
           <Route
             path="/EILP"
@@ -78,6 +80,11 @@ function AppLayout() {
             path="/RentItem"
             element={<RentItem />}
           />
+          <Route
+            path="/destination/loktak"
+            element={<LoktakLakeGuide />}
+          />
+
         </Routes>
       </main>
 

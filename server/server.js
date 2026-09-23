@@ -8,7 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import cartPaymentRoutes from "./routes/cartPaymentRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
-
+import addressRoutes from "./routes/addressRoutes.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -42,7 +42,7 @@ app.use(
 );
 app.use("/api/cart", cartRoutes);
 await connectDB();
-
+app.use("/api/address", addressRoutes);
 app.use(
   "/api/cart-payment",
   cartPaymentRoutes

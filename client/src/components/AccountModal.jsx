@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
 
 export default function AccountModal({
@@ -7,8 +6,6 @@ export default function AccountModal({
     onClose,
     onAuthenticated,
 }) {
-    const navigate = useNavigate();
-
     const [view, setView] = useState(initialView);
 
     const [mobile, setMobile] = useState("");
@@ -35,6 +32,22 @@ export default function AccountModal({
     const [cartItems, setCartItems] = useState([]);
     const [bookingHistory, setBookingHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
+
+    const [address, setAddress] = useState(null);
+    const [addressLoading, setAddressLoading] = useState(false);
+    const [addressSaving, setAddressSaving] = useState(false);
+    const [addressEditing, setAddressEditing] = useState(false);
+    const [addressForm, setAddressForm] = useState({
+        fullName: "",
+        phone: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        district: "",
+        state: "",
+        pincode: "",
+        landmark: "",
+    });
 
     const showMessage = (text, type = "error") => {
         setMessage(text);
@@ -121,10 +134,18 @@ export default function AccountModal({
 
 
         if (initialView === "cart") {
-            loadCart(false).then(() => {
-                setView("cart");
+            loadCart(false).then((items) => {
+                if (items !== null) {
+                    setView("cart");
+                }
             });
 
+            return;
+        }
+
+        if (initialView === "account-details") {
+            setView("account-details");
+            loadAddress();
             return;
         }
 
@@ -198,6 +219,11 @@ export default function AccountModal({
             return;
         }
 
+        if (view === "checkout") {
+            setView("cart");
+            return;
+        }
+
         if (view === "cart") {
             if (
                 authUser?.role === "user"
@@ -210,7 +236,7 @@ export default function AccountModal({
             return;
         }
 
-        if (view === "history") {
+        if (view === "history" || view === "account-details") {
             if (authUser) {
                 setView(
                     authUser.role === "admin"
@@ -543,6 +569,194 @@ export default function AccountModal({
     }, [view]);
 
 
+    const loadAddress = async () => {
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+            setAddress(null);
+            return null;
+        }
+
+        setAddressLoading(true);
+        clearMessage();
+
+        try {
+            const response = await api.get("/address", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const savedAddress =
+                response.data?.address || null;
+
+            setAddress(savedAddress);
+
+            setAddressForm({
+                fullName:
+                    savedAddress?.fullName ||
+                    authUser?.name ||
+                    "",
+
+                phone:
+                    savedAddress?.phone ||
+                    authUser?.mobile ||
+                    authUser?.phone ||
+                    "",
+
+                addressLine1:
+                    savedAddress?.addressLine1 || "",
+
+                addressLine2:
+                    savedAddress?.addressLine2 || "",
+
+                city:
+                    savedAddress?.city || "",
+
+                district:
+                    savedAddress?.district || "",
+
+                state:
+                    savedAddress?.state || "",
+
+                pincode:
+                    savedAddress?.pincode || "",
+
+                landmark:
+                    savedAddress?.landmark || "",
+            });
+
+            return savedAddress;
+
+        } catch (error) {
+            console.error(
+                "Load address error:",
+                error
+            );
+
+            showMessage(
+                error.response?.data?.message ||
+                "Unable to load your account address."
+            );
+
+            return null;
+
+        } finally {
+            setAddressLoading(false);
+        }
+    };
+
+    const openAccountDetails = async () => {
+        clearMessage();
+        setAddressEditing(false);
+        setView("account-details");
+
+        await loadAddress(false);
+    };
+
+    const handleAddressChange = (event) => {
+        const { name, value } = event.target;
+        setAddressForm((current) => ({
+            ...current,
+            [name]: name === "phone" || name === "pincode"
+                ? value.replace(/\D/g, "")
+                : value,
+        }));
+    };
+
+    const saveAddress = async () => {
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+            showMessage("Please sign in to save your address.");
+            return;
+        }
+
+        const required = [
+            ["fullName", "Full name"],
+            ["phone", "Phone number"],
+            ["addressLine1", "Address"],
+            ["city", "City"],
+            ["district", "District"],
+            ["state", "State"],
+            ["pincode", "PIN code"],
+        ];
+
+        for (const [field, label] of required) {
+            if (!String(addressForm[field] || "").trim()) {
+                showMessage(`${label} is required.`);
+                return;
+            }
+        }
+
+        const phone = addressForm.phone.replace(/\D/g, "");
+        const pincode = addressForm.pincode.replace(/\D/g, "");
+
+        if (phone.length !== 10) {
+            showMessage("Please enter a valid 10-digit phone number.");
+            return;
+        }
+
+        if (pincode.length !== 6) {
+            showMessage("Please enter a valid 6-digit PIN code.");
+            return;
+        }
+
+        setAddressSaving(true);
+        clearMessage();
+
+        try {
+            const response = await api.put("/address", {
+                ...addressForm,
+                fullName: addressForm.fullName.trim(),
+                phone,
+                addressLine1: addressForm.addressLine1.trim(),
+                addressLine2: addressForm.addressLine2.trim(),
+                city: addressForm.city.trim(),
+                district: addressForm.district.trim(),
+                state: addressForm.state.trim(),
+                pincode,
+                landmark: addressForm.landmark.trim(),
+            }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setAddress(response.data?.address || addressForm);
+            setAddressEditing(false);
+            showMessage("Address saved successfully.", "success");
+        } catch (error) {
+            console.error("Save address error:", error);
+            showMessage(error.response?.data?.message || "Unable to save your address.");
+        } finally {
+            setAddressSaving(false);
+        }
+    };
+
+    const deleteAddress = async () => {
+        const token = localStorage.getItem("authToken");
+        if (!token || !address?._id) return;
+
+        if (!window.confirm("Are you sure you want to remove your saved address?")) return;
+
+        setAddressSaving(true);
+        clearMessage();
+
+        try {
+            await api.delete(`/address/${address._id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setAddress(null);
+            setAddressEditing(false);
+            showMessage("Saved address removed.", "success");
+        } catch (error) {
+            console.error("Delete address error:", error);
+            showMessage(error.response?.data?.message || "Unable to remove your address.");
+        } finally {
+            setAddressSaving(false);
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem(
             "authToken"
@@ -655,6 +869,7 @@ export default function AccountModal({
                     onHistory={
                         openBookingHistory
                     }
+                    onAccountDetails={openAccountDetails}
                     onLogout={logout}
                 />
             );
@@ -669,11 +884,32 @@ export default function AccountModal({
             );
         }
 
+        if (view === "account-details") {
+            return (
+                <AccountDetailsView
+                    address={address}
+                    addressForm={addressForm}
+                    loading={addressLoading}
+                    saving={addressSaving}
+                    editing={addressEditing}
+                    onEdit={() => {
+                        clearMessage();
+                        setAddressEditing(true);
+                    }}
+                    onCancelEdit={goBack}
+                    onChange={handleAddressChange}
+                    onSave={saveAddress}
+                    onDelete={deleteAddress}
+                />
+            );
+        }
+
         if (view === "cart") {
             return (
                 <CartView
                     items={cartItems}
                     onBack={goBack}
+                    onAccountDetails={openAccountDetails}
                     onCartUpdated={() =>
                         loadCart(false)
                     }
@@ -741,8 +977,14 @@ export default function AccountModal({
                             {view === "cart" &&
                                 "My Cart"}
 
+                            {view === "checkout" &&
+                                "Confirm Booking"}
+
                             {view === "history" &&
                                 "Booking History"}
+
+                            {view === "account-details" &&
+                                "Account Details"}
                         </h2>
                     </div>
 
@@ -1294,6 +1536,7 @@ function UserAccount({
     user,
     onCart,
     onHistory,
+    onAccountDetails,
     onLogout,
 }) {
     return (
@@ -1342,6 +1585,8 @@ function UserAccount({
             <button
                 type="button"
                 className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+
+                onClick={onAccountDetails}
             >
                 <span className="material-symbols-outlined text-[22px]">
                     person
@@ -1500,13 +1745,168 @@ function AccountIdentity({
 
 
 
+
+function AccountDetailsView({
+    address,
+    addressForm,
+    loading,
+    saving,
+    editing,
+    onEdit,
+    onCancelEdit,
+    onChange,
+    onSave,
+    onDelete,
+}) {
+    if (loading) {
+        return (
+            <div className="space-y-5 pt-3">
+                <div className="text-center py-10">
+                    <div className="mx-auto w-14 h-14 rounded-full bg-surface-container-low flex items-center justify-center">
+                        <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
+                    </div>
+                    <h3 className="mt-4 font-bold text-lg">Loading account details</h3>
+                    <p className="mt-1 text-sm text-on-surface-variant">Checking your saved address...</p>
+                </div>
+                <button type="button" onClick={onCancelEdit}
+                    className="w-full px-5 py-3 rounded-xl bg-surface-container text-primary font-bold">
+                    Back to Account
+                </button>
+            </div>
+        );
+    }
+
+    if (!address || editing) {
+        return (
+            <div className="space-y-5 pt-3">
+                <div className="text-center">
+                    <div className="mx-auto w-14 h-14 rounded-full bg-primary-fixed/40 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-primary text-3xl">
+                            {address ? "edit_location_alt" : "add_location_alt"}
+                        </span>
+                    </div>
+                    <h3 className="mt-4 font-bold text-lg">
+                        {address ? "Edit Address" : "Add Your Address"}
+                    </h3>
+                    <p className="mt-1 text-sm text-on-surface-variant">
+                        {address ? "Update your saved address details." : "Add an address for a faster and easier checkout."}
+                    </p>
+                </div>
+
+                <div className="space-y-4">
+                    <AddressField label="Full Name" name="fullName" value={addressForm.fullName} onChange={onChange} placeholder="Enter your full name" required />
+                    <AddressField label="Phone Number" name="phone" value={addressForm.phone} onChange={onChange} placeholder="10-digit mobile number" type="tel" inputMode="numeric" maxLength={10} required />
+                    <AddressField label="Address Line 1" name="addressLine1" value={addressForm.addressLine1} onChange={onChange} placeholder="House number, street, locality" required />
+                    <AddressField label="Address Line 2" name="addressLine2" value={addressForm.addressLine2} onChange={onChange} placeholder="Apartment, village, area (optional)" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <AddressField label="City" name="city" value={addressForm.city} onChange={onChange} placeholder="City / Town" required />
+                        <AddressField label="District" name="district" value={addressForm.district} onChange={onChange} placeholder="District" required />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <AddressField label="State" name="state" value={addressForm.state} onChange={onChange} placeholder="State" required />
+                        <AddressField label="PIN Code" name="pincode" value={addressForm.pincode} onChange={onChange} placeholder="6-digit PIN" inputMode="numeric" maxLength={6} required />
+                    </div>
+                    <AddressField label="Landmark" name="landmark" value={addressForm.landmark} onChange={onChange} placeholder="Nearby landmark (optional)" />
+                </div>
+
+                <button type="button" onClick={onSave} disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-container disabled:opacity-60 transition-colors">
+                    <span className="material-symbols-outlined">{saving ? "progress_activity" : "save"}</span>
+                    {saving ? "Saving Address..." : "Save Address"}
+                </button>
+
+                {address && (
+                    <button type="button" onClick={onCancelEdit} disabled={saving}
+                        className="w-full px-5 py-3 rounded-xl bg-surface-container text-primary font-bold disabled:opacity-60">
+                        Cancel
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-5 pt-3">
+            <div className="flex items-center justify-between gap-3">
+                <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-outline font-bold">Saved Address</p>
+                    <h3 className="font-bold text-lg text-on-surface mt-1">Your Delivery Address</h3>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-fixed/50 text-primary text-[10px] uppercase tracking-wider font-bold">
+                    <span className="material-symbols-outlined text-[14px]">verified</span>Saved
+                </span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+                <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined">location_on</span>
+                    </div>
+                    <div className="min-w-0">
+                        <h4 className="font-bold text-on-surface">{address.fullName}</h4>
+                        <p className="text-sm text-on-surface-variant mt-1">+91 {address.phone}</p>
+                    </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-outline-variant/30 space-y-1.5 text-sm text-on-surface-variant">
+                    <p>{address.addressLine1}</p>
+                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                    <p>{address.city}, {address.district}</p>
+                    <p>{address.state} — {address.pincode}</p>
+                    {address.landmark && <p className="pt-1 text-xs text-outline">Landmark: {address.landmark}</p>}
+                </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+                <button type="button" onClick={onEdit}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-container">
+                    <span className="material-symbols-outlined text-[18px]">edit</span>Edit Address
+                </button>
+                <button type="button" onClick={onDelete} disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-red-700 font-bold hover:bg-red-100 disabled:opacity-60">
+                    <span className="material-symbols-outlined text-[18px]">delete</span>Remove
+                </button>
+            </div>
+
+            <button type="button" onClick={onCancelEdit}
+                className="w-full px-5 py-3 rounded-xl bg-surface-container text-primary font-bold">
+                Back to Account
+            </button>
+        </div>
+    );
+}
+
+function AddressField({ label, name, value, onChange, placeholder, type = "text", inputMode, maxLength, required = false }) {
+    return (
+        <label className="block">
+            <span className="block text-sm font-bold text-on-surface mb-2">
+                {label}{required && <span className="text-secondary ml-1">*</span>}
+            </span>
+            <input
+                type={type}
+                name={name}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                inputMode={inputMode}
+                maxLength={maxLength}
+                autoComplete="off"
+                className="w-full px-4 py-3.5 rounded-xl border border-outline-variant/60 bg-white outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+            />
+        </label>
+    );
+}
+
 function CartView({
     items,
     onBack,
+    onAccountDetails,
     onCartUpdated,
 }) {
-    const [isPaying, setIsPaying] =
-        useState(false);
+    const [isPaying, setIsPaying] = useState(false);
+    const [address, setAddress] = useState(null);
+    const [addressLoading, setAddressLoading] = useState(true);
+    const [selectedAddressId, setSelectedAddressId] = useState("");
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
 
     const total = items.reduce(
         (sum, item) =>
@@ -1516,9 +1916,90 @@ function CartView({
         0
     );
 
+    const loadCheckoutAddress = async () => {
+        const token = localStorage.getItem("authToken");
 
-    const buyNow = async () => {
+        if (!token) {
+            setAddress(null);
+            setSelectedAddressId("");
+            setAddressLoading(false);
+            return;
+        }
+
+        setAddressLoading(true);
+
+        try {
+            const response = await api.get("/address", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const savedAddress =
+                response.data?.address || null;
+
+            setAddress(savedAddress);
+            setSelectedAddressId(
+                savedAddress?._id
+                    ? String(savedAddress._id)
+                    : ""
+            );
+        } catch (error) {
+            console.error(
+                "Load checkout address error:",
+                error
+            );
+
+            setAddress(null);
+            setSelectedAddressId("");
+        } finally {
+            setAddressLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadCheckoutAddress();
+    }, []);
+
+    const proceedToBooking = async () => {
+        if (!items.length) {
+            return;
+        }
+
+        if (addressLoading) {
+            return;
+        }
+
+        if (!address?._id) {
+            alert(
+                "Please add a delivery address in Account Details before booking."
+            );
+            if (onAccountDetails) {
+                onAccountDetails();
+            }
+            return;
+        }
+
+        if (
+            String(selectedAddressId) !==
+            String(address._id)
+        ) {
+            alert("Please select your delivery address.");
+            return;
+        }
+
+        setCheckoutOpen(true);
+    };
+
+    const payAndBook = async () => {
         if (!items.length || isPaying) {
+            return;
+        }
+
+        if (!address?._id) {
+            alert(
+                "Please add a delivery address before booking."
+            );
             return;
         }
 
@@ -1526,9 +2007,7 @@ function CartView({
             setIsPaying(true);
 
             const token =
-                localStorage.getItem(
-                    "authToken"
-                );
+                localStorage.getItem("authToken");
 
             if (!token) {
                 setIsPaying(false);
@@ -1546,10 +2025,19 @@ function CartView({
 
                 return;
             }
+
+            /*
+             * The server re-checks that this address belongs
+             * to the authenticated user and stores a snapshot
+             * on the order. The client never sends the address
+             * fields directly to the payment API.
+             */
             const orderResponse =
                 await api.post(
                     "/cart-payment/create-order",
-                    {},
+                    {
+                        addressId: address._id,
+                    },
                     {
                         headers: {
                             Authorization:
@@ -1560,11 +2048,6 @@ function CartView({
 
             const order =
                 orderResponse.data;
-
-            console.log(
-                "Cart payment order:",
-                order
-            );
 
             if (
                 !order?.razorpayOrderId
@@ -1581,7 +2064,6 @@ function CartView({
                     "Razorpay key was not returned by the server."
                 );
             }
-
 
             if (!window.Razorpay) {
                 throw new Error(
@@ -1607,6 +2089,18 @@ function CartView({
                 order_id:
                     order.razorpayOrderId,
 
+                prefill: {
+                    name:
+                        address.fullName || "",
+                    contact:
+                        address.phone || "",
+                },
+
+                notes: {
+                    addressId:
+                        String(address._id),
+                },
+
                 handler:
                     async function (
                         response
@@ -1618,13 +2112,10 @@ function CartView({
                                     {
                                         orderId:
                                             order.orderId,
-
                                         razorpay_order_id:
                                             response.razorpay_order_id,
-
                                         razorpay_payment_id:
                                             response.razorpay_payment_id,
-
                                         razorpay_signature:
                                             response.razorpay_signature,
                                     },
@@ -1636,11 +2127,6 @@ function CartView({
                                     }
                                 );
 
-                            console.log(
-                                "Payment verification:",
-                                verifyResponse.data
-                            );
-
                             if (
                                 verifyResponse
                                     .data
@@ -1648,27 +2134,23 @@ function CartView({
                                 false
                             ) {
                                 alert(
-                                    "Payment successful!"
+                                    "Booking confirmed and payment successful!"
                                 );
 
-                                /*
-                                 * Backend clears the cart
-                                 * after successful payment
-                                 * verification.
-                                 */
                                 if (
                                     onCartUpdated
                                 ) {
                                     await onCartUpdated();
                                 }
 
-                                /*
-                                 * Notify other components.
-                                 */
                                 window.dispatchEvent(
                                     new Event(
                                         "cart-updated"
                                     )
+                                );
+
+                                setCheckoutOpen(
+                                    false
                                 );
                             }
                         } catch (error) {
@@ -1678,8 +2160,7 @@ function CartView({
                             );
 
                             alert(
-                                error
-                                    .response
+                                error.response
                                     ?.data
                                     ?.message ||
                                 error.message ||
@@ -1695,11 +2176,6 @@ function CartView({
                 modal: {
                     ondismiss:
                         async () => {
-                            /*
-                             * Closing the Razorpay
-                             * window does NOT clear
-                             * the cart.
-                             */
                             setIsPaying(
                                 false
                             );
@@ -1774,9 +2250,7 @@ function CartView({
                         "Payment failed. Please try again."
                     );
 
-                    setIsPaying(
-                        false
-                    );
+                    setIsPaying(false);
                 }
             );
 
@@ -1787,16 +2261,11 @@ function CartView({
                 error
             );
 
-            console.error(
-                "Server response:",
-                error.response?.data
-            );
-
             alert(
                 error.response?.data
                     ?.message ||
                 error.message ||
-                "Unable to create payment order."
+                "Unable to create booking."
             );
 
             setIsPaying(false);
@@ -1826,16 +2295,10 @@ function CartView({
                 }
             );
 
-            /*
-             * Refresh the cart from MongoDB.
-             */
             if (onCartUpdated) {
                 await onCartUpdated();
             }
 
-            /*
-             * Notify other components.
-             */
             window.dispatchEvent(
                 new Event("cart-updated")
             );
@@ -1853,10 +2316,23 @@ function CartView({
         }
     };
 
+    if (checkoutOpen) {
+        return (
+            <BookingCheckout
+                items={items}
+                total={total}
+                address={address}
+                isPaying={isPaying}
+                onBack={() =>
+                    setCheckoutOpen(false)
+                }
+                onPay={payAndBook}
+            />
+        );
+    }
+
     return (
         <div className="space-y-5 pt-3">
-            {/* CART ITEMS */}
-
             {items.length === 0 ? (
                 <div className="text-center py-10">
                     <div className="mx-auto w-14 h-14 rounded-full bg-surface-container-low flex items-center justify-center">
@@ -1941,8 +2417,6 @@ function CartView({
                         )}
                     </div>
 
-                    {/* TOTAL */}
-
                     <div className="flex items-center justify-between pt-4 border-t border-outline-variant/30">
                         <span className="font-bold text-on-surface">
                             Total
@@ -1956,32 +2430,122 @@ function CartView({
                         </strong>
                     </div>
 
-                    {/* BUY NOW */}
+                    <div className="rounded-2xl bg-surface-container-low p-4">
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-xs uppercase tracking-wider font-bold text-outline">
+                                    Delivery Address
+                                </p>
+
+                                <h3 className="mt-1 font-bold text-on-surface">
+                                    Select an address
+                                </h3>
+                            </div>
+
+                            <span className="material-symbols-outlined text-primary">
+                                location_on
+                            </span>
+                        </div>
+
+                        {addressLoading ? (
+                            <div className="mt-4 flex items-center gap-2 text-sm text-on-surface-variant">
+                                <span className="material-symbols-outlined text-[18px] animate-spin">
+                                    progress_activity
+                                </span>
+                                Loading saved address...
+                            </div>
+                        ) : address ? (
+                            <label className="mt-4 block cursor-pointer">
+                                <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 hover:border-primary transition-colors">
+                                    <input
+                                        type="radio"
+                                        name="checkout-address"
+                                        value={address._id}
+                                        checked={
+                                            String(
+                                                selectedAddressId
+                                            ) ===
+                                            String(
+                                                address._id
+                                            )
+                                        }
+                                        onChange={() =>
+                                            setSelectedAddressId(
+                                                String(
+                                                    address._id
+                                                )
+                                            )
+                                        }
+                                        className="mt-1 accent-[#004335]"
+                                    />
+
+                                    <div className="min-w-0 text-sm">
+                                        <p className="font-bold text-on-surface">
+                                            {address.fullName}
+                                        </p>
+
+                                        <p className="mt-1 text-on-surface-variant">
+                                            {address.addressLine1}
+                                            {address.addressLine2
+                                                ? `, ${address.addressLine2}`
+                                                : ""}
+                                        </p>
+
+                                        <p className="text-on-surface-variant">
+                                            {address.city},{" "}
+                                            {address.district},{" "}
+                                            {address.state} -{" "}
+                                            {address.pincode}
+                                        </p>
+
+                                        <p className="mt-1 text-xs text-outline">
+                                            Phone: {address.phone}
+                                        </p>
+
+                                        {address.landmark && (
+                                            <p className="text-xs text-outline">
+                                                Landmark:{" "}
+                                                {address.landmark}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </label>
+                        ) : (
+                            <div className="mt-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm">
+                                No saved address found. Add an address in Account Details before booking.
+                            </div>
+                        )}
+
+                        <button
+                            type="button"
+                            onClick={onAccountDetails}
+                            className="mt-3 text-sm font-bold text-primary hover:underline"
+                        >
+                            {address
+                                ? "Edit address"
+                                : "Add delivery address"}
+                        </button>
+                    </div>
 
                     <button
                         type="button"
-                        onClick={buyNow}
+                        onClick={proceedToBooking}
                         disabled={
-                            isPaying
+                            addressLoading ||
+                            !address ||
+                            !selectedAddressId
                         }
                         className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-container disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
                         <span className="material-symbols-outlined">
-                            {isPaying
-                                ? "progress_activity"
-                                : "shopping_bag"}
+                            arrow_forward
                         </span>
 
-                        {isPaying
-                            ? "Processing Payment..."
-                            : `Buy Now • ₹${total.toLocaleString(
-                                "en-IN"
-                            )}`}
+                        Proceed to Booking
                     </button>
                 </>
             )}
-
-            {/* BACK */}
 
             <button
                 type="button"
@@ -1989,6 +2553,152 @@ function CartView({
                 className="w-full px-5 py-3 rounded-xl bg-surface-container text-primary font-bold hover:bg-surface-container-high transition-colors"
             >
                 Back to Account
+            </button>
+        </div>
+    );
+}
+
+
+function BookingCheckout({
+    items,
+    total,
+    address,
+    isPaying,
+    onBack,
+    onPay,
+}) {
+    return (
+        <div className="space-y-5 pt-3">
+            <div>
+                <p className="text-xs uppercase tracking-[0.16em] font-bold text-outline">
+                    Booking Review
+                </p>
+
+                <h3 className="mt-1 text-xl font-bold text-primary">
+                    Confirm your tourism purchase
+                </h3>
+
+                <p className="mt-1 text-sm text-on-surface-variant">
+                    Review your saved delivery address and items before opening Razorpay.
+                </p>
+            </div>
+
+            {address && (
+                <div className="rounded-2xl bg-surface-container-low p-4">
+                    <div className="flex items-start justify-between gap-3">
+                        <div>
+                            <p className="text-xs uppercase tracking-wider font-bold text-outline">
+                                Deliver to
+                            </p>
+
+                            <p className="mt-1 font-bold text-on-surface">
+                                {address.fullName}
+                            </p>
+
+                            <p className="mt-1 text-sm text-on-surface-variant">
+                                {address.addressLine1}
+                                {address.addressLine2
+                                    ? `, ${address.addressLine2}`
+                                    : ""}
+                            </p>
+
+                            <p className="text-sm text-on-surface-variant">
+                                {address.city},{" "}
+                                {address.district},{" "}
+                                {address.state} -{" "}
+                                {address.pincode}
+                            </p>
+
+                            <p className="mt-1 text-xs text-outline">
+                                Phone: {address.phone}
+                            </p>
+                        </div>
+
+                        <span className="material-symbols-outlined text-primary">
+                            verified
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            <div className="rounded-2xl bg-surface-container-low p-4">
+                <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs uppercase tracking-wider font-bold text-outline">
+                        Order Summary
+                    </span>
+
+                    <span className="font-bold text-primary">
+                        ₹
+                        {total.toLocaleString(
+                            "en-IN"
+                        )}
+                    </span>
+                </div>
+
+                <div className="space-y-2">
+                    {items.map((item) => (
+                        <div
+                            key={item.itemId}
+                            className="flex items-center justify-between gap-3 text-sm"
+                        >
+                            <span className="min-w-0 text-on-surface-variant">
+                                {item.name} ×{" "}
+                                {item.quantity}
+                            </span>
+
+                            <span className="shrink-0 font-semibold text-on-surface">
+                                ₹
+                                {(
+                                    Number(item.price) *
+                                    Number(item.quantity)
+                                ).toLocaleString(
+                                    "en-IN"
+                                )}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-outline-variant/30 flex items-center justify-between">
+                    <span className="font-bold text-on-surface">
+                        Total
+                    </span>
+
+                    <span className="text-xl font-bold text-primary">
+                        ₹
+                        {total.toLocaleString(
+                            "en-IN"
+                        )}
+                    </span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                onClick={onPay}
+                disabled={isPaying || !address}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-container disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            >
+                <span className="material-symbols-outlined">
+                    {isPaying
+                        ? "progress_activity"
+                        : "payments"}
+                </span>
+
+                {isPaying
+                    ? "Processing Booking..."
+                    : `Confirm Booking • ₹${total.toLocaleString(
+                        "en-IN"
+                    )}`}
+            </button>
+
+            <button
+                type="button"
+                onClick={onBack}
+                disabled={isPaying}
+                className="w-full px-5 py-3 rounded-xl bg-surface-container text-primary font-bold hover:bg-surface-container-high disabled:opacity-60 transition-colors"
+            >
+                Change Address
             </button>
         </div>
     );

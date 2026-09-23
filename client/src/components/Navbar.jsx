@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api.js";
 import AccountModal from "./AccountModal.jsx";
-
+import TranslatePicker from "../ui/TranslatePicker.jsx";
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -66,7 +66,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[60] bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(10,92,74,0.06),0_1px_3px_0_rgba(10,92,74,0.04)]">
+    <header className="fixed top-0 left-0 w-full z-[100] bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(10,92,74,0.06),0_1px_3px_0_rgba(10,92,74,0.04)]">
       <div className="min-h-20 w-full px-5 md:px-5 lg:px-12 flex items-center justify-between gap-gutter">
         <div className="flex items-center gap-2 shrink min-w-0">
           <img
@@ -106,7 +106,7 @@ export default function Navbar() {
           </NavItem>
 
           <NavItem to="/CultureHeritageItems">
-            Cultural Heritage Items
+            Cultural Shopping
           </NavItem>
 
           <NavItem to="/RentItem">
@@ -126,14 +126,9 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-low text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
-            <span className="font-label-sm font-semibold">
-              ENG
-            </span>
+          <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-surface-container-low text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
 
-            <span className="material-symbols-outlined text-outline text-[18px]">
-              expand_more
-            </span>
+            <TranslatePicker />
           </div>
 
           <button
@@ -184,6 +179,7 @@ export default function Navbar() {
             {profileOpen && authUser && (
               <ProfileDropdown
                 user={authUser}
+                onAccountDetails={() => openAccountModal("account-details")}
                 onCart={() => openAccountModal("cart")}
                 onHistory={() => openAccountModal("history")}
                 onLogout={closeProfile}
@@ -245,7 +241,7 @@ export default function Navbar() {
             to="/CultureHeritageItems"
             close={() => setMobileMenuOpen(false)}
           >
-            Culture Heritage Items
+            Cultural Shopping
           </MobileNavItem>
 
           <MobileNavItem
@@ -326,6 +322,7 @@ function MobileNavItem({ to, close, children }) {
 
 function ProfileDropdown({
   user,
+  onAccountDetails,
   onCart,
   onHistory,
   onLogout,
@@ -420,7 +417,7 @@ function ProfileDropdown({
             <ProfileMenuButton
               icon="person"
               label="Account Details"
-              onClick={onNavigate}
+              onClick={onAccountDetails}
             />
 
             <ProfileMenuButton

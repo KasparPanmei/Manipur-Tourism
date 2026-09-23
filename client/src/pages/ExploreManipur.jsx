@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TelemetryBar from '../components/home/TelemetryBar.jsx';
 const circuits = [
     {
@@ -410,7 +411,7 @@ const districts = [
     'Thoubal',
 ];
 
-function CircuitCard({ circuit, onWaypoints }) {
+function CircuitCard({ circuit, onWaypoints, onNavigate }) {
     const badgeColor = circuit.tone === 'secondary'
         ? 'text-secondary'
         : 'text-primary';
@@ -418,7 +419,14 @@ function CircuitCard({ circuit, onWaypoints }) {
         ? 'bg-secondary'
         : 'bg-primary-container';
     return (
-        <article className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_16px_-2px_rgba(10,92,74,0.06),0_1px_3px_0_rgba(0,0,0,0.04)] hover:shadow-xl transition-all duration-300 flex flex-col group">
+        <article
+            onClick={() => {
+                if (circuit.id === 'cir-01') {
+                    onNavigate('/destination/loktak');
+                }
+            }}
+            className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_16px_-2px_rgba(10,92,74,0.06),0_1px_3px_0_rgba(0,0,0,0.04)] hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
+        >
             <div className="relative h-56 w-full overflow-hidden">
                 <img
                     className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
@@ -488,6 +496,7 @@ export default function ExploreManipur() {
     const [permit, setPermit] = useState('all');
     const [duration, setDuration] = useState('all');
     const [modal, setModal] = useState(null);
+    const navigate = useNavigate();
     const filtered = useMemo(
         () => {
             const q = search.toLowerCase().trim();
@@ -658,7 +667,12 @@ export default function ExploreManipur() {
                         {filtered.length
                             ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filtered.map(c => (
-                                    <CircuitCard key={c.id} circuit={c} onWaypoints={setModal} />
+                                    <CircuitCard
+                                        key={c.id}
+                                        circuit={c}
+                                        onWaypoints={setModal}
+                                        onNavigate={navigate}
+                                    />
                                 ))}
                             </div>
                             : <div className="text-center py-16 px-4 bg-surface-container-lowest rounded-2xl shadow-sm">
